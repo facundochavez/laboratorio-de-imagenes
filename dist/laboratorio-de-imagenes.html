@@ -106,7 +106,8 @@ svg.i{width:16px; height:16px; flex:none}
 .tab .n{font-family:var(--font-display); font-weight:700; color:var(--muted)}
 .tab .opt{font-size:11.5px; color:var(--muted); border:1px solid var(--line-2); border-radius:999px; padding:0 6px; line-height:1.5}
 .tab:hover{color:var(--ink)}
-.tab[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent); font-weight:600}
+/* La pestaña activa no cambia de peso: así el ancho no varía y nada se corre */
+.tab[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent)}
 .tab[aria-selected="true"] .n{color:var(--accent)}
 
 /* ---------- Cuerpo ---------- */
@@ -218,19 +219,16 @@ canvas.px{image-rendering:pixelated; image-rendering:crisp-edges}
 #codehost{flex:1; min-width:0; display:flex}
 .codeside.resizing{user-select:none}
 .codecard{flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden}
-.codehead{display:flex; flex-direction:column; gap:10px; padding:18px 18px 16px; border-bottom:1px solid var(--line)}
-.codebox{position:relative; flex:1; min-height:0; display:flex}
-.copyfab{position:absolute; top:10px; right:18px; width:32px; height:32px; display:grid; place-items:center; border-radius:8px; border:1px solid var(--line-2); background:var(--panel); color:var(--ink-2); cursor:pointer; padding:0; box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.copyfab:hover{color:var(--ink); border-color:var(--ink-2)}
-.copyfab svg{width:16px; height:16px}
-.copyfab .ic-check{display:none}
-.copyfab.ok{color:#2FA36B; border-color:#2FA36B}
-.copyfab.ok .ic-copy{display:none}
-.copyfab.ok .ic-check{display:block}
-.codehead h3{font-family:var(--font-display); font-weight:650; font-size:19px; margin:0 0 4px}
-.codehead p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.45}
-.codehead .live{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin:2px 0 0; font-family:var(--font-body); font-weight:400; vertical-align:2px}
-.codehead .live i{width:7px; height:7px; border-radius:50%; background:#2FA36B; display:inline-block}
+/* Encabezado angosto del panel: título chico a la izquierda, copiar a la derecha */
+.codehead{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 10px 7px 16px; border-bottom:1px solid var(--line)}
+.codehead h3{margin:0; font-family:var(--font-body); font-size:13px; font-weight:600; color:var(--ink-2)}
+.copybtn{width:28px; height:28px; flex:none; display:grid; place-items:center; border-radius:7px; border:1px solid transparent; background:none; color:var(--ink-2); cursor:pointer; padding:0}
+.copybtn:hover{color:var(--ink); border-color:var(--line-2); background:var(--paper)}
+.copybtn svg{width:15px; height:15px}
+.copybtn .ic-check{display:none}
+.copybtn.ok{color:#2FA36B}
+.copybtn.ok .ic-copy{display:none}
+.copybtn.ok .ic-check{display:block}
 pre.code{flex:1; min-height:0; margin:0; background:var(--code-bg); font-family:var(--font-code); font-variant-ligatures:none; font-feature-settings:"liga" 0, "calt" 0; font-size:12.5px; line-height:1.6; overflow:auto; padding:14px 0; counter-reset:ln; tab-size:2}
 pre.code .ln{display:block; padding:0 20px 0 0; white-space:pre; min-height:1.6em; transition:background-color 1.6s ease}
 pre.code .ln::before{counter-increment:ln; content:counter(ln); display:inline-block; width:40px; padding-right:12px; text-align:right; color:var(--code-ln); user-select:none}
@@ -1310,18 +1308,13 @@ function initCodePanels() {
   ["e11", "e12", "e13", "e14", "e21", "e22", "e23"].forEach(id => {
     $("#codehost").insertAdjacentHTML("beforeend", `<section class="codecard" data-tab="${id}" aria-labelledby="${id}-codet" hidden>
       <div class="codehead">
-        <div>
-          <h3 id="${id}-codet">Código en ejecución</h3>
-          <p>Todos los algoritmos están implementados a mano, píxel por píxel, sin bibliotecas de procesamiento. Este es el código fuente real de las funciones que están procesando la imagen, con los parámetros elegidos.</p>
-        </div>
-      </div>
-      <div class="codebox">
-        <pre class="code" id="${id}-code" tabindex="0" aria-label="Código fuente en ejecución"></pre>
-        <button class="copyfab" type="button" data-copy="${id}" aria-label="Copiar código" title="Copiar código">
+        <h3 id="${id}-codet">Código en ejecución</h3>
+        <button class="copybtn" type="button" data-copy="${id}" aria-label="Copiar código" title="Copiar código">
           <svg class="ic-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
           <svg class="ic-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
         </button>
       </div>
+      <pre class="code" id="${id}-code" tabindex="0" aria-label="Código fuente en ejecución"></pre>
     </section>`);
     codePanels[id] = { prev: null, text: "" };
   });
