@@ -185,7 +185,8 @@ label.check input{accent-color:var(--accent); width:16px; height:16px}
 .stage-bar .grp{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 body.no-downloads [data-r="dl"]{display:none}
 .stage-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:12px}
-.stage-actions .btn{padding:4px 11px; font-size:13px; line-height:1.4; border-radius:7px}
+.stage-actions .btn{padding:4px 11px 4px 9px; font-size:13px; line-height:1.4; border-radius:7px; gap:5px}
+.stage-actions .btn svg{width:14px; height:14px; flex:none}
 .btn:disabled{opacity:.45; cursor:not-allowed}
 .wells{display:grid; grid-template-columns:repeat(var(--n,2), minmax(0,1fr)); gap:14px}
 .well{margin:0; background:var(--well); border-radius:var(--radius); padding:12px; min-width:0}
@@ -205,6 +206,8 @@ canvas.px{image-rendering:pixelated; image-rendering:crisp-edges}
 .curtain-inner{position:relative; touch-action:none; cursor:ew-resize; user-select:none; max-width:min(100%, 760px); margin:0 auto}
 .zoomed .curtain-inner{max-width:none}
 .curtain-inner .cB{position:absolute; inset:0; height:100%}
+/* En la cortina el zoom lo aplica el contenedor: sus imágenes ocupan su ancho, no se vuelven a ampliar */
+.zoomed .curtain-inner canvas{width:100%}
 .curtain-inner .handle{position:absolute; top:0; bottom:0; width:2px; background:#fff; transform:translateX(-1px); box-shadow:0 0 0 1px rgba(0,0,0,.25)}
 .curtain-inner .handle::after{content:""; position:absolute; top:50%; left:50%; width:26px; height:26px; transform:translate(-50%,-50%); border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .curtain-inner .tag{position:absolute; top:8px; font-size:12px; line-height:1; padding:4px 7px; border-radius:5px; background:rgba(20,20,20,.62); color:#fff}
@@ -1419,8 +1422,8 @@ function makeStage(root, labels, opts = {}) {
         <span class="tag l">${labels[0]}</span><span class="tag r">${labels[1]}</span>
       </div></div><figcaption><span>Arrastrá el divisor para comparar</span><span class="dim"></span></figcaption></figure>` : ""}
     <div class="stage-actions">
-      <button class="btn" data-r="apply" type="button">Aplicar</button>
-      <button class="btn" data-r="dl" type="button">Descargar</button>
+      <button class="btn" data-r="apply" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Aplicar</button>
+      <button class="btn" data-r="dl" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>Descargar</button>
     </div>`;
   const wells = $$(".wells .well", root), canv = wells.map(w => $("canvas", w)), scrollers = $$(".scroller", root);
   const layout = () => { root.classList.toggle("mode-curtain", st.mode === "curtain"); root.classList.toggle("zoomed", st.zoom > 1); root.style.setProperty("--z", st.zoom); draw(); };
