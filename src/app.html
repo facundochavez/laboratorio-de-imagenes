@@ -1,0 +1,2014 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laboratorio de imágenes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Banco de laboratorio: encabezado y pestañas arriba, imágenes a la izquierda, mesa de trabajo y código en vivo a la derecha */
+:root{
+  --paper:#ECEEF0; --panel:#F8F9FA; --ink:#1A1D21; --ink-2:#434A53; --muted:#69707A;
+  --line:#D3D7DC; --line-2:#BCC2C9; --well:#767676; --well-ink:#F2F2F2;
+  --accent:#2747C7; --accent-ink:#FFFFFF; --accent-soft:#DCE2FA;
+  --series-a:#8A929C; --grid:#E1E4E8;
+  --code-bg:#FFFFFF; --code-ln:#A3AAB3; --code-flash:#FFF1B8;
+  --tk-kw:#2747C7; --tk-num:#A2470D; --tk-str:#1F7A4A; --tk-com:#6B737D; --tk-fn:#7A35B0;
+  --font-display:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-code:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --scroll-thumb:#B4BAC2; --scroll-track:transparent;
+  --thumb-frame:#6E7680; --thumb-x:#FFFFFF;
+  --radius:10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#191B1F; --panel:#22252A; --ink:#ECEEF1; --ink-2:#C3C8CF; --muted:#8F96A0;
+    --line:#33373D; --line-2:#474C54; --accent:#93A6FF; --accent-ink:#0E1430; --accent-soft:#29315A;
+    --series-a:#6F7782; --grid:#2E3237;
+    --code-bg:#15171A; --code-ln:#545B64; --code-flash:#4A3F12;
+    --tk-kw:#93A6FF; --tk-num:#F0A35E; --tk-str:#7CCB98; --tk-com:#7F8893; --tk-fn:#CDA6F5;
+    --scroll-thumb:#4A5059;
+    --thumb-frame:#9AA1AA; --thumb-x:#191B1F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#191B1F; --panel:#22252A; --ink:#ECEEF1; --ink-2:#C3C8CF; --muted:#8F96A0;
+  --line:#33373D; --line-2:#474C54; --accent:#93A6FF; --accent-ink:#0E1430; --accent-soft:#29315A;
+  --series-a:#6F7782; --grid:#2E3237;
+  --code-bg:#15171A; --code-ln:#545B64; --code-flash:#4A3F12;
+  --tk-kw:#93A6FF; --tk-num:#F0A35E; --tk-str:#7CCB98; --tk-com:#7F8893; --tk-fn:#CDA6F5;
+  --scroll-thumb:#4A5059;
+  --thumb-frame:#9AA1AA; --thumb-x:#191B1F;
+  color-scheme: dark;
+}
+:root[data-theme="light"]{color-scheme: light}
+*{box-sizing:border-box}
+/* Todas las barras de desplazamiento finas, como la de las pestañas */
+html, *{scrollbar-color:var(--scroll-thumb) var(--scroll-track); scrollbar-width:thin}
+::-webkit-scrollbar{width:8px; height:8px; background:var(--scroll-track)}
+::-webkit-scrollbar-thumb{background:var(--scroll-thumb); border-radius:999px; border:2px solid transparent; background-clip:padding-box}
+::-webkit-scrollbar-corner{background:transparent}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.55; font-variant-numeric:tabular-nums}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:10; background:var(--panel)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+svg.i{width:16px; height:16px; flex:none}
+.gutter{padding-left:max(24px, env(safe-area-inset-left, 0px)); padding-right:max(24px, env(safe-area-inset-right, 0px))}
+
+/* ---------- Encabezado ---------- */
+/* Encabezado: a la izquierda el contenido (que puede partirse en varias líneas), a la derecha el switch de tema.
+   El switch se alinea con la primera línea: centrado con el título si todo entra en una línea, arriba si hay varias. */
+.top{background:var(--panel); border-bottom:1px solid var(--line); padding-block:16px; display:flex; align-items:flex-start; gap:24px}
+/* --gap-sub: espacio entre título y subtítulo. --gap-team: el que debe quedar entre subtítulo y grupo para que se vea igual,
+   descontando el interlineado de cada línea (título 26px × 1.05; subtítulo y grupo 14px × 1.4) */
+.top{--gap-sub:4px; --gap-team:calc(var(--gap-sub) + 26px * 0.05 / 2 - 14px * 0.4 / 2)}
+.top-main{flex:1 1 auto; min-width:0; display:flex; align-items:first baseline; justify-content:space-between; gap:var(--gap-team) 32px; flex-wrap:wrap}
+.brand{display:flex; flex-direction:column; gap:var(--gap-sub); min-width:0}
+.brand h1{font-family:var(--font-display); font-weight:700; font-size:26px; line-height:1.05; letter-spacing:-.025em; margin:0}
+.brand p{margin:0; color:var(--muted); font-size:14px; line-height:1.4; font-weight:500; text-wrap:balance}
+.brand p span{color:var(--muted)}
+/* space-between: en una línea el grupo va a la derecha (alineado por línea base con el título); si pasa a su propia línea queda solo y space-between lo deja al inicio */
+.team{margin:0; font-size:14px; line-height:1.4; color:var(--ink); font-weight:500}
+.team .lbl{color:var(--muted); font-weight:400}
+.team a{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px; text-decoration-color:var(--line-2); white-space:nowrap}
+.team a:hover{text-decoration-color:currentColor}
+.team a .ext{width:13px; height:13px; margin-left:2px; vertical-align:-1px}
+.theme-switch{position:relative; margin-top:calc(26px * 1.05 / 2 - 15px); background:var(--paper); display:inline-flex; align-items:center; justify-content:space-between; width:calc(var(--sw-pad) * 2 + var(--sw-knob) + var(--sw-travel) + 2px); height:30px; padding:0; border-radius:999px; border:1px solid var(--line-2); cursor:pointer; color:var(--muted); flex:none}
+/* El encabezado ocupa todo el ancho: por debajo de 890 px el switch sale del encabezado y flota abajo a la derecha */
+@media (max-width: 889.98px){
+  .theme-switch{position:fixed; z-index:30; margin:0; right:calc(20px + env(safe-area-inset-right, 0px)); bottom:calc(20px + env(safe-area-inset-bottom, 0px)); background:var(--panel); box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  /* Sin el switch en el encabezado, el grupo pasa siempre a su propia línea debajo del título */
+  .top-main{flex-direction:column; align-items:flex-start}
+}
+/* Geometría: perilla de 24 px a 2 px del borde que se desplaza --sw-travel; el ancho total se deriva de esos valores
+   (2 + 24 + 26 + 2 + 2 de borde = 56 px). Cada ícono se centra sobre una de las dos posiciones de la perilla. */
+.theme-switch{--sw-knob:24px; --sw-pad:2px; --sw-icon:14px; --sw-travel:26px}
+.theme-switch .knob{position:absolute; top:var(--sw-pad); left:var(--sw-pad); width:var(--sw-knob); height:var(--sw-knob); border-radius:50%; background:var(--accent); transition:transform .2s ease}
+.theme-switch[aria-checked="true"] .knob{transform:translateX(var(--sw-travel))}
+.theme-switch svg{position:absolute; z-index:1; width:var(--sw-icon); height:var(--sw-icon); top:calc(var(--sw-pad) + (var(--sw-knob) - var(--sw-icon)) / 2)}
+.theme-switch .sun{left:calc(var(--sw-pad) + (var(--sw-knob) - var(--sw-icon)) / 2)}
+.theme-switch .moon{left:calc(var(--sw-pad) + var(--sw-travel) + (var(--sw-knob) - var(--sw-icon)) / 2)}
+.theme-switch[aria-checked="false"] .sun,.theme-switch[aria-checked="true"] .moon{color:var(--accent-ink)}
+
+/* ---------- Pestañas ---------- */
+.tabbar{position:sticky; top:env(safe-area-inset-top, 0px); z-index:5; background:var(--panel); border-bottom:1px solid var(--line); display:flex; align-items:stretch; gap:4px; overflow-x:auto; scrollbar-width:thin}
+.tabgrp{display:flex; align-items:stretch; gap:2px; flex:none}
+.tabgrp + .tabgrp{border-left:1px solid var(--line); padding-left:10px; margin-left:8px}
+.tabgrp .gl{align-self:center; font-size:12.5px; color:var(--muted); margin-right:6px; white-space:nowrap}
+.tab{border:0; background:none; cursor:pointer; padding:13px 12px 11px; border-bottom:3px solid transparent; color:var(--ink-2); font-size:14px; white-space:nowrap; display:flex; align-items:baseline; gap:7px}
+.tab .n{font-family:var(--font-display); font-weight:700; color:var(--muted)}
+.tab .opt{font-size:11.5px; color:var(--muted); border:1px solid var(--line-2); border-radius:999px; padding:0 6px; line-height:1.5}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent); font-weight:600}
+.tab[aria-selected="true"] .n{color:var(--accent)}
+
+/* ---------- Cuerpo ---------- */
+.layout{display:grid; grid-template-columns:136px minmax(0,1fr) var(--code-w, 380px)}
+.side{border-right:1px solid var(--line); padding:20px 14px; position:sticky; top:calc(env(safe-area-inset-top, 0px) + 48px); height:calc(100vh - 48px); overflow:auto; display:flex; flex-direction:column; gap:12px}
+.side h2{font-size:13px; font-weight:600; color:var(--ink-2); margin:0}
+.side .hint{margin:0}
+.imgs{display:grid; grid-template-columns:minmax(0,1fr); gap:12px}
+.thumb{background:none; border:0; padding:0; cursor:pointer; text-align:left; color:var(--muted); font-size:12.5px; line-height:1.25; min-width:0; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start}
+.thumb canvas,.thumb .ph{width:100%; aspect-ratio:4/3; object-fit:cover; display:block; border-radius:7px; background:var(--well); margin-bottom:5px; outline:2px solid transparent; outline-offset:2px}
+.thumb:hover canvas,.thumbwrap:hover .thumb canvas{outline-color:var(--thumb-frame)}
+.thumbwrap{position:relative; min-width:0}
+#imgs, #imgs *{transition:none !important; animation:none !important}
+.thumbwrap .thumb{width:100%}
+/* Capa sobre la miniatura (misma caja 4:3 que el canvas) para los botones de quitar y restaurar */
+.thumb-ovl{position:absolute; top:0; left:0; right:0; aspect-ratio:4/3; pointer-events:none}
+.thumb-act{position:absolute; width:16px; height:16px; border-radius:50%; border:0; padding:0; display:grid; place-items:center; cursor:pointer; background:var(--thumb-frame); color:var(--thumb-x); opacity:0; pointer-events:none}
+.thumb-act svg{width:10px; height:10px}
+.thumb-act.rm{top:-5px; right:-5px}
+.thumb-act.undo{bottom:-5px; right:-5px; display:none}
+.thumbwrap.modified .thumb-act.undo{display:grid}
+.thumbwrap:hover .thumb-act,.thumbwrap:focus-within .thumb-act{opacity:1; pointer-events:auto}
+.thumbwrap:has(.thumb[aria-pressed="true"]) .thumb-act{background:var(--accent)}
+.thumb[aria-pressed="true"]{color:var(--ink); font-weight:600}
+.thumb[aria-pressed="true"] canvas,.thumb[aria-pressed="true"]:hover canvas,.thumbwrap:hover .thumb[aria-pressed="true"] canvas{outline-color:var(--accent)}
+.thumb.add .ph{background:none; border:1.5px dashed var(--line-2); display:grid; place-items:center; color:var(--muted)}
+.thumb.add .ph svg{width:22px; height:22px}
+body.dragging main{outline:3px dashed var(--accent); outline-offset:-12px}
+
+main{padding-block:26px 64px; min-width:0}
+.inner{container-type:inline-size}
+.inner{max-width:1320px}
+.panel-ex{display:flex; flex-direction:column; gap:22px}
+.ex-head h2{font-family:var(--font-display); font-weight:650; font-size:26px; line-height:1.12; margin:0 0 6px; letter-spacing:-.01em; text-wrap:balance}
+.ex-head p{margin:0; color:var(--ink-2); max-width:78ch}
+.badge{display:inline-block; font-family:var(--font-body); font-size:12px; font-weight:600; color:var(--accent); border:1px solid currentColor; border-radius:999px; padding:0 9px; margin-left:8px; vertical-align:4px}
+
+.bench{display:grid; grid-template-columns:250px minmax(0,1fr); gap:22px; align-items:start}
+.controls{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px; display:flex; flex-direction:column; gap:20px}
+.controls h3{font-size:13px; font-weight:600; color:var(--ink-2); margin:0 0 8px}
+.ctl{display:block}
+.ctl-row{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:14px; margin-bottom:4px}
+.ctl-row output{font-weight:600; min-width:4ch; text-align:right}
+.hint{font-size:13px; color:var(--muted); margin:6px 0 0; line-height:1.45}
+.stat{font-size:13px; color:var(--ink-2); line-height:1.5}
+.stat b{font-weight:600; color:var(--ink)}
+input[type=range]{width:100%; appearance:none; background:transparent; height:22px; margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px; background:var(--line-2); border-radius:4px}
+input[type=range]::-moz-range-track{height:4px; background:var(--line-2); border-radius:4px}
+input[type=range]::-webkit-slider-thumb{appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); margin-top:-6px; border:2px solid var(--panel); box-shadow:0 0 0 1px var(--accent)}
+input[type=range]::-moz-range-thumb{width:14px; height:14px; border-radius:50%; background:var(--accent); border:2px solid var(--panel)}
+input[type=range]:disabled{opacity:.4}
+.seg{display:flex; flex-wrap:wrap; gap:4px; background:var(--paper); border:1px solid var(--line); border-radius:9px; padding:3px}
+.seg button{flex:1 1 auto; border:0; background:none; border-radius:6px; padding:5px 9px; font-size:13.5px; cursor:pointer; color:var(--ink-2); white-space:nowrap}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--panel); color:var(--ink); box-shadow:0 0 0 1px var(--line-2); font-weight:600}
+.seg button:disabled{opacity:.4; cursor:not-allowed}
+.seg.col{flex-direction:column}
+.seg.col button{text-align:left; white-space:normal; line-height:1.35}
+.seg.sm button{padding:3px 8px; font-size:13px}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{border:1px solid var(--line-2); background:none; border-radius:999px; padding:3px 10px; font-size:13px; cursor:pointer; color:var(--ink-2)}
+.chip:hover{border-color:var(--accent); color:var(--accent)}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; border:1px solid var(--line-2); background:var(--panel); border-radius:8px; padding:7px 12px; font-size:14px; cursor:pointer; color:var(--ink)}
+.btn:hover{border-color:var(--ink-2)}
+.btn.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:600}
+.btns{display:flex; flex-direction:column; gap:8px}
+select.sel{width:100%; border:1px solid var(--line-2); background:var(--panel); border-radius:8px; padding:6px 8px; font-size:14px}
+label.check{display:flex; gap:8px; align-items:center; font-size:14px; cursor:pointer}
+label.check input{accent-color:var(--accent); width:16px; height:16px}
+
+/* ---------- Escenario ---------- */
+.stage{min-width:0}
+.stage-bar{display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; align-items:center; margin-bottom:12px}
+.stage-bar .grp{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+body.no-downloads [data-r="dl"]{display:none}
+.stage-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:12px}
+.stage-actions .btn{padding:4px 11px; font-size:13px; line-height:1.4; border-radius:7px}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.wells{display:grid; grid-template-columns:repeat(var(--n,2), minmax(0,1fr)); gap:14px}
+.well{margin:0; background:var(--well); border-radius:var(--radius); padding:12px; min-width:0}
+.scroller{overflow:hidden; border-radius:3px; line-height:0}
+.zoomed .scroller{overflow:auto; max-height:68vh; cursor:grab; touch-action:none}
+.zoomed .scroller.panning{cursor:grabbing; user-select:none}
+.zoomed .curtain-inner{cursor:inherit}
+.curtain-inner .handle::before{content:""; position:absolute; top:0; bottom:0; left:-12px; width:26px; cursor:ew-resize}
+.well canvas{display:block; width:100%; height:auto}
+canvas.px{image-rendering:pixelated; image-rendering:crisp-edges}
+.zoomed .scroller canvas,.zoomed .curtain-inner{width:calc(var(--z) * 100%)}
+.well figcaption{display:flex; justify-content:space-between; align-items:baseline; gap:8px; color:var(--well-ink); font-size:13px; margin-top:9px; line-height:1.3}
+.well figcaption .dim{opacity:.75}
+.curtain-well{display:none}
+.mode-curtain .wells{display:none}
+.mode-curtain .curtain-well{display:block}
+.curtain-inner{position:relative; touch-action:none; cursor:ew-resize; user-select:none; max-width:min(100%, 760px); margin:0 auto}
+.zoomed .curtain-inner{max-width:none}
+.curtain-inner .cB{position:absolute; inset:0; height:100%}
+.curtain-inner .handle{position:absolute; top:0; bottom:0; width:2px; background:#fff; transform:translateX(-1px); box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.curtain-inner .handle::after{content:""; position:absolute; top:50%; left:50%; width:26px; height:26px; transform:translate(-50%,-50%); border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.curtain-inner .tag{position:absolute; top:8px; font-size:12px; line-height:1; padding:4px 7px; border-radius:5px; background:rgba(20,20,20,.62); color:#fff}
+.curtain-inner .tag.l{left:8px} .curtain-inner .tag.r{right:8px}
+
+/* ---------- Código en vivo (barra lateral derecha) ---------- */
+.codeside{position:sticky; top:calc(env(safe-area-inset-top, 0px) + 48px); height:calc(100vh - 48px); border-left:1px solid var(--line); background:var(--panel); display:flex; min-width:0}
+.codeside .resizer{flex:none; width:8px; margin-left:-4px; cursor:col-resize; position:relative; z-index:2; touch-action:none; background:none; border:0; padding:0}
+.codeside .resizer::after{content:""; position:absolute; top:0; bottom:0; left:3px; width:2px; background:transparent; transition:background .15s}
+.codeside .resizer:hover::after,.codeside .resizer:focus-visible::after,.codeside.resizing .resizer::after{background:var(--accent)}
+.codeside .resizer .grip{position:absolute; top:50%; left:1px; width:6px; height:36px; transform:translateY(-50%); border-radius:3px; background:var(--line-2)}
+#codehost{flex:1; min-width:0; display:flex}
+.codeside.resizing{user-select:none}
+.codecard{flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden}
+.codehead{display:flex; flex-direction:column; gap:10px; padding:18px 18px 16px; border-bottom:1px solid var(--line)}
+.codebox{position:relative; flex:1; min-height:0; display:flex}
+.copyfab{position:absolute; top:10px; right:18px; width:32px; height:32px; display:grid; place-items:center; border-radius:8px; border:1px solid var(--line-2); background:var(--panel); color:var(--ink-2); cursor:pointer; padding:0; box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.copyfab:hover{color:var(--ink); border-color:var(--ink-2)}
+.copyfab svg{width:16px; height:16px}
+.copyfab .ic-check{display:none}
+.copyfab.ok{color:#2FA36B; border-color:#2FA36B}
+.copyfab.ok .ic-copy{display:none}
+.copyfab.ok .ic-check{display:block}
+.codehead h3{font-family:var(--font-display); font-weight:650; font-size:19px; margin:0 0 4px}
+.codehead p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.45}
+.codehead .live{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin:2px 0 0; font-family:var(--font-body); font-weight:400; vertical-align:2px}
+.codehead .live i{width:7px; height:7px; border-radius:50%; background:#2FA36B; display:inline-block}
+pre.code{flex:1; min-height:0; margin:0; background:var(--code-bg); font-family:var(--font-code); font-variant-ligatures:none; font-feature-settings:"liga" 0, "calt" 0; font-size:12.5px; line-height:1.6; overflow:auto; padding:14px 0; counter-reset:ln; tab-size:2}
+pre.code .ln{display:block; padding:0 20px 0 0; white-space:pre; min-height:1.6em; transition:background-color 1.6s ease}
+pre.code .ln::before{counter-increment:ln; content:counter(ln); display:inline-block; width:40px; padding-right:12px; text-align:right; color:var(--code-ln); user-select:none}
+pre.code .ln.chg{background:var(--code-flash); transition:none}
+.tk-kw{color:var(--tk-kw); font-weight:600} .tk-num{color:var(--tk-num)} .tk-str{color:var(--tk-str)}
+.tk-com{color:var(--tk-com); font-style:italic} .tk-fn{color:var(--tk-fn)}
+
+/* ---------- Detalles ---------- */
+.details{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px}
+.details .wide{grid-column:1/-1}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; min-width:0}
+.card h3{font-family:var(--font-display); font-weight:650; font-size:19px; margin:0 0 10px}
+.card ol,.card ul{margin:0; padding-left:20px}
+.card li{margin:3px 0}
+.chart{width:100%; display:block}
+.charts{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px}
+.legend{display:flex; gap:16px; font-size:13px; color:var(--ink-2); margin:0 0 6px}
+.histhead{display:flex; justify-content:space-between; align-items:center; gap:8px 16px; flex-wrap:wrap; margin-bottom:6px}
+.histhead .legend{margin:0}
+.binsctl{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-2)}
+.binsctl.below{margin:10px 0 0 52px}
+.legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:-1px}
+.minis{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.minis figure{margin:0}
+.minis canvas{width:100%; display:block; border-radius:4px; background:var(--well)}
+.minis figcaption{font-size:13px; color:var(--ink-2); margin-top:5px}
+.palettes{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px}
+.palbtn{border:1px solid var(--line); border-radius:8px; background:var(--panel); padding:8px; cursor:pointer; text-align:left; font-size:13px; color:var(--ink-2)}
+.palbtn canvas{width:100%; height:16px; display:block; border-radius:3px; margin-bottom:6px}
+.palbtn[aria-pressed="true"]{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); color:var(--ink)}
+.history{display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:13px; color:var(--ink-2)}
+.history span.step{background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:2px 8px}
+
+#tip{position:fixed; pointer-events:none; z-index:20; background:var(--ink); color:var(--paper); font-size:12.5px; padding:5px 8px; border-radius:6px; opacity:0; transition:opacity .1s; white-space:nowrap}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px){
+  .layout{grid-template-columns:136px minmax(0,1fr)}
+  .codeside{grid-column:1 / -1; position:static; height:auto; border-left:0; border-top:1px solid var(--line)}
+  .codeside .resizer{display:none}
+  pre.code{max-height:70vh}
+}
+@media (max-width: 860px){
+  .gutter{padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px))}
+  .layout{grid-template-columns:1fr}
+  .side{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px))}
+  .side .hint{display:none}
+  .imgs{display:flex; align-items:flex-start; overflow-x:auto; gap:10px; padding:6px 6px 6px; margin:-6px -6px 0}
+  .imgs .thumb{white-space:nowrap}
+  .imgs .thumb{overflow:visible}
+  .thumbwrap,.imgs > .thumb{flex:0 0 84px}
+  .details{grid-template-columns:1fr}
+  .codeside{grid-column:auto}
+  .tab .t,.tab .opt{display:none}
+}
+/* ---------- Ancho del área central (container queries, al final para que ganen) ---------- */
+@container (max-width: 720px){
+  .bench{grid-template-columns:minmax(0,1fr)}
+  .controls{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); align-items:start}
+}
+@container (max-width: 560px){ .wells,.charts,.minis{grid-template-columns:minmax(0,1fr)} }
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<header class="top gutter">
+  <div class="top-main">
+  <div class="brand">
+    <h1>Laboratorio de imágenes</h1>
+    <p>Procesamiento de Imágenes, Diplodatos&nbsp;2026 <span>/</span> Trabajos prácticos 1&nbsp;y&nbsp;2</p>
+  </div>
+  <p class="team"><span class="lbl">Grupo 2:</span> <span class="names"><a href="https://www.facundochavez.dev/es" target="_blank" rel="noopener">Chavez&nbsp;Facundo<svg class="ext" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>, <a href="https://www.fcad.uner.edu.ar/graduados/entrega-de-titulos-54/" target="_blank" rel="noopener">Droz&nbsp;Mariano&nbsp;Rafael<svg class="ext" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a></span></p>
+  </div>
+  <button class="theme-switch" id="themebtn" type="button" role="switch" aria-checked="false" aria-label="Modo oscuro">
+    <span class="knob" aria-hidden="true"></span>
+    <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+    <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+  </button>
+</header>
+
+<nav class="tabbar gutter" aria-label="Ejercicios">
+  <div class="tabgrp" role="tablist" aria-label="Trabajo práctico 1">
+    <span class="gl">TP 1</span>
+    <button class="tab" role="tab" data-tab="e11"><span class="n">1.1</span><span class="t">Luminancia y saturación</span></button>
+    <button class="tab" role="tab" data-tab="e12"><span class="n">1.2</span><span class="t">Histograma</span></button>
+    <button class="tab" role="tab" data-tab="e13"><span class="n">1.3</span><span class="t">Paletas</span><span class="opt">optativo</span></button>
+    <button class="tab" role="tab" data-tab="e14"><span class="n">1.4</span><span class="t">Aritmética de píxeles</span><span class="opt">optativo</span></button>
+  </div>
+  <div class="tabgrp" role="tablist" aria-label="Trabajo práctico 2">
+    <span class="gl">TP 2</span>
+    <button class="tab" role="tab" data-tab="e21"><span class="n">2.1</span><span class="t">Convolución</span></button>
+    <button class="tab" role="tab" data-tab="e22"><span class="n">2.2</span><span class="t">Morfología</span></button>
+    <button class="tab" role="tab" data-tab="e23"><span class="n">2.3</span><span class="t">Remuestreo y cuantización</span><span class="opt">optativo</span></button>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="side" id="side" aria-label="Imagen de trabajo">
+    <div class="imgs" id="imgs"></div>
+    <p class="hint" id="side-hint">Elegí una imagen o arrastrá una propia sobre la página.</p>
+  </aside>
+
+  <main class="gutter">
+   <div class="inner">
+
+    <!-- ===================== 1.1 ===================== -->
+    <section class="panel-ex" id="e11" role="tabpanel">
+      <header class="ex-head">
+        <h2>1.1 Luminancia y saturación en YIQ</h2>
+        <p>Cada píxel pasa de RGB a YIQ. Se escala Y con el coeficiente <i>a</i> para cambiar la luminancia, e I y Q con <i>b</i> para cambiar la saturación, y se vuelve a RGB.</p>
+      </header>
+      <div class="bench">
+        <div class="controls">
+          <div>
+            <label class="ctl"><span class="ctl-row"><span>Luminancia, <i>a</i></span><output id="e11-ao">1.00</output></span>
+            <input type="range" id="e11-a" min="0" max="2" step="0.01" value="1"></label>
+            <label class="ctl" style="margin-top:12px"><span class="ctl-row"><span>Saturación, <i>b</i></span><output id="e11-bo">1.00</output></span>
+            <input type="range" id="e11-b" min="0" max="2" step="0.01" value="1"></label>
+          </div>
+          <div>
+            <h3>Valores de las filminas</h3>
+            <div class="chips" id="e11-presets">
+              <button class="chip" type="button" data-a="0.7" data-b="1">a 0.7</button>
+              <button class="chip" type="button" data-a="0.4" data-b="1">a 0.4</button>
+              <button class="chip" type="button" data-a="1.2" data-b="1">a 1.2</button>
+              <button class="chip" type="button" data-a="1.5" data-b="1">a 1.5</button>
+              <button class="chip" type="button" data-a="1" data-b="0.5">b 0.5</button>
+              <button class="chip" type="button" data-a="1" data-b="0">b 0</button>
+              <button class="chip" type="button" data-a="1" data-b="1.2">b 1.2</button>
+              <button class="chip" type="button" data-a="1" data-b="1.5">b 1.5</button>
+              <button class="chip" type="button" data-a="1" data-b="1">Restablecer</button>
+            </div>
+          </div>
+          <div>
+            <h3>Recortes aplicados</h3>
+            <div class="stat" id="e11-stat"></div>
+            <p class="hint" id="e11-gray" hidden>Esta imagen está en escala de grises: I y Q valen 0, así que <i>b</i> no tiene efecto.</p>
+          </div>
+        </div>
+        <div class="stage" id="e11-stage"></div>
+      </div>
+      <div class="details">
+        <div class="card wide">
+          <h3>Canales YIQ del resultado</h3>
+          <div class="minis">
+            <figure><canvas id="e11-cy"></canvas><figcaption>Y, luminancia</figcaption></figure>
+            <figure><canvas id="e11-ci"></canvas><figcaption>I, eje naranja–azul (gris = 0)</figcaption></figure>
+            <figure><canvas id="e11-cq"></canvas><figcaption>Q, eje violeta–verde (gris = 0)</figcaption></figure>
+          </div>
+        </div>
+        <div class="card wide">
+          <h3>Qué observar</h3>
+          <ul>
+            <li>Con a &gt; 1 las zonas claras se aplanan: Y no puede pasar de 1 y se pierden detalles. El contador de recortes muestra cuántos píxeles se saturan.</li>
+            <li>Con b = 0 la imagen queda en blanco y negro sin cambiar su luminancia.</li>
+            <li>Subir mucho a o b hace visibles los artefactos de compresión JPEG (bloques de 8×8 en el cielo del astronauta o en el café).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 1.2 ===================== -->
+    <section class="panel-ex" id="e12" role="tabpanel" hidden>
+      <header class="ex-head">
+        <h2>1.2 Manipulación del histograma de luminancias</h2>
+        <p>Se aplica una función Y′ = f(Y) a la luminancia de cada píxel sin tocar la cromaticidad (I y Q). La raíz aclara, el cuadrado oscurece y la lineal a trozos estira el contraste.</p>
+      </header>
+      <div class="bench">
+        <div class="controls">
+          <div>
+            <h3>Filtro</h3>
+            <div class="seg col" id="e12-f">
+              <button data-v="sqrt" aria-pressed="true">Raíz, Y′ = √Y</button>
+              <button data-v="sq">Cuadrado, Y′ = Y²</button>
+              <button data-v="lin">Lineal a trozos</button>
+              <button data-v="eq">Ecualización (extra)</button>
+            </div>
+          </div>
+          <div id="e12-lin" hidden>
+            <label class="ctl"><span class="ctl-row"><span>Y<sub>mín</sub></span><output id="e12-mino">0.20</output></span>
+            <input type="range" id="e12-min" min="0" max="1" step="0.01" value="0.2"></label>
+            <label class="ctl" style="margin-top:10px"><span class="ctl-row"><span>Y<sub>máx</sub></span><output id="e12-maxo">0.80</output></span>
+            <input type="range" id="e12-max" min="0" max="1" step="0.01" value="0.8"></label>
+            <button class="btn" id="e12-auto" type="button" style="margin-top:12px; width:100%">Estimar desde el histograma</button>
+            <p class="hint">Toma los percentiles 1 y 99 de la luminancia como Y<sub>mín</sub> e Y<sub>máx</sub>.</p>
+          </div>
+          <div class="stat" id="e12-stat"></div>
+        </div>
+        <div class="stage" id="e12-stage"></div>
+      </div>
+      <div class="details">
+        <div class="card wide">
+          <h3>Histogramas y función de transferencia</h3>
+          <div class="charts">
+            <div>
+              <div class="histhead">
+                <div class="legend"><span><i style="background:var(--series-a)"></i>Original</span><span><i style="background:var(--accent)"></i>Procesada</span></div>
+              </div>
+              <canvas class="chart" id="e12-h1" style="height:130px"></canvas>
+              <canvas class="chart" id="e12-h2" style="height:130px; margin-top:6px"></canvas>
+                <div class="binsctl below"><span id="e12-binsl">Columnas</span>
+                  <div class="seg sm" id="e12-bins" role="group" aria-labelledby="e12-binsl">
+                    <button data-v="10">10</button><button data-v="20">20</button><button data-v="50" aria-pressed="true">50</button><button data-v="100">100</button>
+                  </div>
+                </div>
+            </div>
+            <div>
+              <div class="legend"><span>f(Y), con la identidad punteada como referencia</span></div>
+              <canvas class="chart" id="e12-tf" style="height:266px"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card wide">
+          <h3>Qué observar</h3>
+          <ul>
+            <li>Donde la pendiente de f es mayor que 1 las luminancias se separan, y donde es menor se juntan.</li>
+            <li>La raíz mejora imágenes oscuras (la luna, el fotógrafo) y el cuadrado las sobreexpuestas.</li>
+            <li>La lineal a trozos solo funciona bien si Y<sub>mín</sub> e Y<sub>máx</sub> encierran casi todo el histograma. Probá con las monedas, que tienen poco rango dinámico.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 1.3 ===================== -->
+    <section class="panel-ex" id="e13" role="tabpanel" hidden>
+      <header class="ex-head">
+        <h2>1.3 Visualización de datos 2D con paletas <span class="badge">Optativo</span></h2>
+        <p>Un dataset 2D es una matriz de valores, no una imagen. Para verlo se normaliza a [0, 1] y cada valor se mapea a un color con una paleta. La misma información puede contar historias muy distintas según la paleta.</p>
+      </header>
+      <div class="bench">
+        <div class="controls">
+          <div>
+            <h3>Dataset</h3>
+            <div class="seg col" id="e13-ds">
+              <button data-v="julia" aria-pressed="true">Fractal de Julia, tiempo de escape</button>
+              <button data-v="terrain">Mapa de altitud sintético</button>
+              <button data-v="temp">Mapa de temperatura sintético</button>
+              <button data-v="img">Luminancia de la imagen elegida</button>
+            </div>
+          </div>
+          <div id="e13-julia">
+            <h3>Parámetro c del conjunto de Julia</h3>
+            <select class="sel" id="e13-c">
+              <option value="-0.4,0.6">c = −0.4 + 0.6i</option>
+              <option value="-0.123,0.745">c = −0.123 + 0.745i, conejo de Douady</option>
+              <option value="-0.8,0.156">c = −0.8 + 0.156i, espirales</option>
+              <option value="0.285,0.01">c = 0.285 + 0.01i</option>
+              <option value="0,1">c = i, dendrita</option>
+            </select>
+          </div>
+          <div id="e13-seedw" hidden>
+            <button class="btn" id="e13-seed" type="button" style="width:100%">Generar otro mapa</button>
+          </div>
+          <div>
+            <h3>Escala de valores</h3>
+            <div class="seg sm" id="e13-scale">
+              <button data-v="lin" aria-pressed="true">Lineal</button><button data-v="sqrt">Raíz</button><button data-v="log">Logarítmica</button>
+            </div>
+          </div>
+          <div>
+            <label class="ctl"><span class="ctl-row"><span>Niveles de la paleta</span><output id="e13-lvo">Continua</output></span>
+            <input type="range" id="e13-lv" min="0" max="24" step="1" value="0"></label>
+            <label class="check" style="margin-top:10px"><input type="checkbox" id="e13-inv"> Invertir paleta</label>
+          </div>
+        </div>
+        <div class="stage" id="e13-stage"></div>
+      </div>
+      <div class="card">
+        <h3>Paletas</h3>
+        <div class="palettes" id="e13-pals"></div>
+        <div style="margin-top:16px">
+          <div class="legend" id="e13-unit"></div>
+          <canvas class="chart" id="e13-bar" style="height:46px"></canvas>
+        </div>
+      </div>
+      <div class="details">
+        <div class="card wide">
+          <h3>Qué observar</h3>
+          <ul>
+            <li>El arco iris marca bordes donde los datos no los tienen (la franja amarilla y la cian se ven como saltos) y no tiene un orden claro de más a menos.</li>
+            <li>La paleta perceptual y la de grises aumentan su luminosidad en forma pareja, así que se leen bien en blanco y negro.</li>
+            <li>La divergente solo tiene sentido cuando el centro del rango significa algo, como 0 °C o el nivel del mar.</li>
+            <li>En el fractal casi todos los valores son bajos: la escala logarítmica revela la estructura que la lineal esconde.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 1.4 ===================== -->
+    <section class="panel-ex" id="e14" role="tabpanel" hidden>
+      <header class="ex-head">
+        <h2>1.4 Aritmética de píxeles <span class="badge">Optativo</span></h2>
+        <p>Se combinan dos imágenes A y B en una nueva C. Toda operación se define por dos decisiones: en qué espacio cromático se hace y cómo se cierra la aritmética cuando el resultado se sale de rango.</p>
+      </header>
+      <div class="bench">
+        <div class="controls">
+          <div>
+            <h3>Imagen B</h3>
+            <select class="sel" id="e14-b"></select>
+            <p class="hint">La imagen A es la elegida en la barra lateral. B se ajusta al tamaño de A por vecino más cercano.</p>
+          </div>
+          <div>
+            <h3>Operación</h3>
+            <div class="seg col" id="e14-op">
+              <button data-v="add" aria-pressed="true">Suma</button>
+              <button data-v="sub">Resta</button>
+              <button data-v="mul">Producto</button>
+              <button data-v="div">Cociente</button>
+              <button data-v="absd">Resta absoluta</button>
+              <button data-v="light">If-lighter</button>
+              <button data-v="dark">If-darker</button>
+            </div>
+          </div>
+          <div>
+            <h3>Espacio cromático</h3>
+            <div class="seg sm" id="e14-sp"><button data-v="rgb">RGB</button><button data-v="yiq" aria-pressed="true">YIQ</button></div>
+          </div>
+          <div>
+            <h3>Cierre de la aritmética</h3>
+            <div class="seg sm" id="e14-cl"><button data-v="clamp" aria-pressed="true">Clampeada</button><button data-v="avg">Promediada</button></div>
+            <p class="hint" id="e14-clh"></p>
+          </div>
+        </div>
+        <div class="stage" id="e14-stage"></div>
+      </div>
+      <div class="details">
+        <div class="card wide">
+          <h3>Qué observar</h3>
+          <ul>
+            <li>Compará suma RGB clampeada y suma YIQ clampeada: en la primera aparecen colores que no estaban en ninguna de las dos imágenes (deriva cromática).</li>
+            <li>La suma promediada en RGB no altera los colores, pero oscurece el resultado donde alguna de las dos imágenes es oscura.</li>
+            <li>La resta revela diferencias: probá dos imágenes parecidas, o una imagen contra sí misma.</li>
+            <li>If-lighter en RGB mezcla canales de píxeles distintos y genera colores raros; en YIQ conserva colores reales.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 2.1 ===================== -->
+    <section class="panel-ex" id="e21" role="tabpanel" hidden>
+      <header class="ex-head">
+        <h2>2.1 Filtrado por convolución</h2>
+        <p>Se trabaja sobre la luminancia Y. Para cada píxel se apoya el centro del kernel, se multiplican las celdas correlativas y se suman los productos. En los bordes se repiten la primera y la última fila o columna.</p>
+      </header>
+      <div class="bench">
+        <div class="controls">
+          <div>
+            <h3>Pasabajos</h3>
+            <div class="seg col" id="e21-k">
+              <button data-v="plano" aria-pressed="true">Plano</button>
+              <button data-v="bartlett">Bartlett 3×3</button>
+              <button data-v="gauss">Gaussiano 5×5</button>
+            </div>
+          </div>
+          <div id="e21-planow">
+            <h3>Tamaño del plano</h3>
+            <div class="seg sm" id="e21-ps"><button data-v="3" aria-pressed="true">3×3</button><button data-v="5">5×5</button><button data-v="7">7×7</button></div>
+          </div>
+          <div>
+            <h3>Detectores de bordes</h3>
+            <div class="seg col" id="e21-k2">
+              <button data-v="lap">Laplaciano v4</button>
+              <button data-v="sN">Sobel norte</button>
+              <button data-v="sS">Sobel sur</button>
+              <button data-v="sE">Sobel este</button>
+              <button data-v="sO">Sobel oeste</button>
+            </div>
+          </div>
+          <div>
+            <h3>Pasabanda y extras</h3>
+            <div class="seg col" id="e21-k3">
+              <button data-v="dog">Pasabanda, diferencia de gaussianas</button>
+              <button data-v="sharp">Realce, identidad + 0.2·Laplaciano (extra)</button>
+            </div>
+          </div>
+          <div>
+            <h3>Valores fuera de [0, 1]</h3>
+            <div class="seg sm" id="e21-disp"><button data-v="clamp" aria-pressed="true">Recortar</button><button data-v="abs">Valor absoluto</button><button data-v="mid">Centrar en gris</button></div>
+            <p class="hint">Recortar es lo que pide la teoría. Las otras dos muestran también la parte negativa de los filtros de ganancia cero.</p>
+            <label class="ctl" style="margin-top:12px"><span class="ctl-row"><span>Amplificar para ver</span><output id="e21-go">×1</output></span>
+            <input type="range" id="e21-g" min="1" max="10" step="1" value="1"></label>
+          </div>
+        </div>
+        <div class="stage" id="e21-stage"></div>
+      </div>
+      <div class="details">
+        <div class="card wide">
+          <h3>Qué observar</h3>
+          <ul>
+            <li>El plano borronea más que Bartlett y gaussiano con el mismo tamaño, y deja un leve "rebote" típico de la sinc.</li>
+            <li>El Laplaciano resalta aristas en todas las direcciones; cada Sobel resalta solo las que van de oscuro a claro en su dirección.</li>
+            <li>La diferencia de gaussianas elimina tanto el fondo parejo como el ruido más fino: deja una banda de frecuencias intermedias.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 2.2 ===================== -->
+    <section class="panel-ex" id="e22" role="tabpanel" hidden>
+      <header class="ex-head">
+        <h2>2.2 Morfología en niveles de gris</h2>
+        <p>Con un elemento estructurante cuadrado de 3×3, la erosión toma el mínimo de la vecindad y la dilatación el máximo. El resto de las operaciones se arma combinándolas.</p>
+      </header>
+      <div class="bench">
+        <div class="controls">
+          <div>
+            <h3>Operación</h3>
+            <div class="seg col" id="e22-op">
+              <button data-v="ero" aria-pressed="true">Erosión, mínimo</button>
+              <button data-v="dil">Dilatación, máximo</button>
+              <button data-v="open">Apertura</button>
+              <button data-v="close">Cierre</button>
+              <button data-v="bext">Borde exterior</button>
+              <button data-v="bint">Borde interior</button>
+              <button data-v="grad">Gradiente morfológico</button>
+              <button data-v="med">Mediana</button>
+              <button data-v="top">Top-hat</button>
+            </div>
+          </div>
+          <div class="btns">
+            <button class="btn primary" id="e22-copy" type="button">Copiar resultado al original</button>
+            <button class="btn" id="e22-noise" type="button">Agregar ruido sal y pimienta</button>
+            <button class="btn" id="e22-reset" type="button">Volver a la imagen inicial</button>
+          </div>
+          <div>
+            <label class="check"><input type="checkbox" id="e22-str"> Estirar contraste del resultado</label>
+            <p class="hint">Bordes y top-hat dan valores bajos. Estirar solo cambia cómo se ve, no lo que se copia.</p>
+          </div>
+          <div>
+            <h3>Secuencia aplicada</h3>
+            <div class="history" id="e22-hist"></div>
+          </div>
+        </div>
+        <div class="stage" id="e22-stage"></div>
+      </div>
+      <div class="details">
+        <div class="card wide">
+          <h3>Qué observar</h3>
+          <ul>
+            <li>Con ruido sal y pimienta, la mediana lo elimina casi por completo sin borronear los bordes, cosa que el gaussiano del 2.1 no logra.</li>
+            <li>La apertura borra detalles claros más chicos que 3×3, y el cierre los oscuros. En la página escaneada, el cierre afina las letras y la apertura las engrosa (son oscuras sobre blanco).</li>
+            <li>El top-hat en la imagen del Hubble aísla las estrellas pequeñas y brillantes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 2.3 ===================== -->
+    <section class="panel-ex" id="e23" role="tabpanel" hidden>
+      <header class="ex-head">
+        <h2>2.3 Remuestreo y cuantización <span class="badge">Optativo</span></h2>
+        <p>Cambiar la resolución es ajustar las muestras a una función interpolante y evaluarla en nuevas posiciones. Cuantizar es forzar cada luminancia a uno de n niveles. Ambas imágenes se muestran siempre al mismo tamaño para compararlas.</p>
+      </header>
+      <div class="bench">
+        <div class="controls">
+          <div>
+            <h3>Operación</h3>
+            <div class="seg col" id="e23-mode">
+              <button data-v="down" aria-pressed="true">Downsampling ×2</button>
+              <button data-v="up">Upsampling ×2</button>
+              <button data-v="quant">Cuantización</button>
+            </div>
+          </div>
+          <div id="e23-rs">
+            <h3>Kernel</h3>
+            <div class="seg sm" id="e23-k"><button data-v="const" aria-pressed="true">Constante</button><button data-v="bil">Bilineal</button><button data-v="bic">Bicúbico</button></div>
+          </div>
+          <div id="e23-q" hidden>
+            <label class="ctl"><span class="ctl-row"><span>Niveles de gris</span><output id="e23-no">4</output></span>
+            <input type="range" id="e23-n" min="2" max="32" step="1" value="4"></label>
+            <h3 style="margin-top:14px">Método</h3>
+            <div class="seg col" id="e23-qm">
+              <button data-v="unif" aria-pressed="true">Uniforme</button>
+              <button data-v="rand">Dithering aleatorio</button>
+              <button data-v="scan">Difusión del error por scan-line</button>
+              <button data-v="fs">Floyd–Steinberg (extra)</button>
+            </div>
+          </div>
+          <div class="stat" id="e23-stat"></div>
+          <p class="hint">La placa zonal (última imagen de la barra lateral) tiene frecuencias crecientes hacia los bordes: es ideal para ver el aliasing.</p>
+        </div>
+        <div class="stage" id="e23-stage"></div>
+      </div>
+      <div class="details">
+        <div class="card wide">
+          <h3>Qué observar</h3>
+          <ul>
+            <li>En la placa zonal, el downsampling constante genera anillos falsos (aliasing). Bilineal y bicúbico los atenúan porque filtran antes de muestrear.</li>
+            <li>En upsampling, el constante deja escalones; el bilineal suaviza pero borronea, y el bicúbico conserva más nitidez. Usá el zoom 4×.</li>
+            <li>Con pocos niveles, la uniforme genera falsos contornos. El dithering y la difusión los cambian por textura, y la forma se entiende mejor aunque el error RMS sea igual o mayor.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+   </div>
+  </main>
+
+  <aside class="codeside" id="codeside" aria-label="Código en ejecución">
+    <button class="resizer" id="resizer" type="button" aria-label="Cambiar el ancho del panel de código; usar flechas izquierda y derecha"><span class="grip"></span></button>
+    <div id="codehost"></div>
+  </aside>
+</div>
+<div id="tip" role="status"></div>
+<input type="file" id="file" accept="image/*" hidden>
+
+<script>
+/*__DEMO__*/
+</script>
+<script>
+"use strict";
+/* =====================================================================
+   Laboratorio de imágenes — Procesamiento de Imágenes, Diplodatos 2026
+   Integrantes: Chavez Facundo, Droz Mariano Rafael
+   Todos los algoritmos de procesamiento están implementados a mano.
+   El panel "Código en ejecución" muestra el código fuente de estas
+   mismas funciones, leído en vivo con Function.prototype.toString().
+   ===================================================================== */
+
+/* ---------- Utilidades de interfaz ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (v, d = 2) => Number(v).toFixed(d);
+const pct = v => (v * 100).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " %";
+const clampi = (v, a, b) => v < a ? a : v > b ? b : v;
+
+/* =====================================================================
+   NÚCLEO: funciones de procesamiento (las que se muestran en el panel)
+   ===================================================================== */
+
+// Una imagen es { w, h, c, d }: c = 3 (RGB) o 1 (gris) y d guarda los valores en [0, 1]
+function makeImg(w, h, c) {
+  return { w, h, c, d: new Float32Array(w * h * c) };
+}
+
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+
+// Lee el RGB normalizado del píxel p (una imagen en gris repite su valor)
+const leerRGB = (img, p) => img.c === 3
+  ? [img.d[3 * p], img.d[3 * p + 1], img.d[3 * p + 2]]
+  : [img.d[p], img.d[p], img.d[p]];
+
+// Matriz RGB → YIQ de la cátedra (NB3)
+const M_RGB2YIQ = [
+  [0.299, 0.587, 0.114],
+  [0.59590059, -0.27455667, -0.32134392],
+  [0.21153661, -0.52273617, 0.31119955]
+];
+
+// Inversa de una matriz 3×3 por cofactores
+function invertir3x3(m) {
+  const [a, b, c] = m[0], [d, e, f] = m[1], [g, h, i] = m[2];
+  const A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g;
+  const det = a * A + b * B + c * C;
+  return [
+    [A / det, -(b * i - c * h) / det, (b * f - c * e) / det],
+    [B / det, (a * i - c * g) / det, -(a * f - c * d) / det],
+    [C / det, -(a * h - b * g) / det, (a * e - b * d) / det]
+  ];
+}
+const M_YIQ2RGB = invertir3x3(M_RGB2YIQ);
+const I_MAX = 0.5957, Q_MAX = 0.5226;
+
+function rgbAYiq(r, g, b) {
+  const M = M_RGB2YIQ;
+  return [
+    M[0][0] * r + M[0][1] * g + M[0][2] * b,
+    M[1][0] * r + M[1][1] * g + M[1][2] * b,
+    M[2][0] * r + M[2][1] * g + M[2][2] * b
+  ];
+}
+
+function yiqARgb(y, i, q) {
+  const M = M_YIQ2RGB;
+  return [
+    clamp01(M[0][0] * y + M[0][1] * i + M[0][2] * q),
+    clamp01(M[1][0] * y + M[1][1] * i + M[1][2] * q),
+    clamp01(M[2][0] * y + M[2][1] * i + M[2][2] * q)
+  ];
+}
+
+// Y = 0.299 R + 0.587 G + 0.114 B (primera fila de la matriz)
+function luminancia(img) {
+  if (img.c === 1) return img;
+  const out = makeImg(img.w, img.h, 1);
+  for (let p = 0; p < img.w * img.h; p++) {
+    const [r, g, b] = leerRGB(img, p);
+    out.d[p] = 0.299 * r + 0.587 * g + 0.114 * b;
+  }
+  return out;
+}
+
+/* ----- 1.1 Luminancia y saturación ----- */
+function ajustarLuminanciaSaturacion(img, a, b) {
+  const out = makeImg(img.w, img.h, 3);
+  let recortesY = 0, recortesIQ = 0;
+  for (let p = 0; p < img.w * img.h; p++) {
+    // 1 y 2. RGB normalizado del píxel → YIQ
+    const [r, g, bl] = leerRGB(img, p);
+    let [Y, I, Q] = rgbAYiq(r, g, bl);
+    // 3 y 4. Escalar la luminancia y la saturación
+    Y = a * Y;
+    I = b * I;
+    Q = b * Q;
+    // 5. Chequear que Y' <= 1
+    if (Y > 1) { Y = 1; recortesY++; }
+    // 6. Chequear -0.5957 < I' < 0.5957 y -0.5226 < Q' < 0.5226
+    const Ic = Math.max(-I_MAX, Math.min(I_MAX, I));
+    const Qc = Math.max(-Q_MAX, Math.min(Q_MAX, Q));
+    if (Ic !== I || Qc !== Q) recortesIQ++;
+    // 7 y 8. Y'I'Q' → R'G'B' normalizado
+    const [R, G, B] = yiqARgb(Y, Ic, Qc);
+    out.d[3 * p] = R; out.d[3 * p + 1] = G; out.d[3 * p + 2] = B;
+  }
+  return { out, recortesY, recortesIQ };
+}
+
+/* ----- 1.2 Histograma de luminancias ----- */
+const filtroRaiz = y => Math.sqrt(y);
+const filtroCuadrado = y => y * y;
+
+function filtroLinealATrozos(ymin, ymax) {
+  return y => y < ymin ? 0 : y > ymax ? 1 : (y - ymin) / (ymax - ymin);
+}
+
+// Ecualización: cada luminancia pasa a la proporción de píxeles menos luminosos
+function filtroEcualizacion(Y) {
+  const N = 256, acum = new Float64Array(N);
+  for (const v of Y.d) acum[Math.min(N - 1, Math.floor(clamp01(v) * N))]++;
+  for (let k = 1; k < N; k++) acum[k] += acum[k - 1];
+  for (let k = 0; k < N; k++) acum[k] /= Y.d.length;
+  return y => acum[Math.min(N - 1, Math.floor(y * N))];
+}
+
+function aplicarFiltroLuminancia(img, f) {
+  const out = makeImg(img.w, img.h, 3);
+  for (let p = 0; p < img.w * img.h; p++) {
+    const [r, g, b] = leerRGB(img, p);
+    const [Y, I, Q] = rgbAYiq(r, g, b);
+    // Solo cambia la luminancia; la cromaticidad (I, Q) no se altera
+    const [R, G, B] = yiqARgb(f(clamp01(Y)), I, Q);
+    out.d[3 * p] = R; out.d[3 * p + 1] = G; out.d[3 * p + 2] = B;
+  }
+  return out;
+}
+
+// Frecuencia relativa de Y en columnas [k/n, (k+1)/n)
+function histograma(Y, columnas) {
+  const h = new Float64Array(columnas);
+  for (const v of Y.d) h[Math.min(columnas - 1, Math.floor(clamp01(v) * columnas))]++;
+  for (let k = 0; k < columnas; k++) h[k] /= Y.d.length;
+  return h;
+}
+
+/* ----- 1.3 Datasets 2D y paletas ----- */
+function normalizar(datos) {
+  let lo = Infinity, hi = -Infinity;
+  for (const v of datos) { if (v < lo) lo = v; if (v > hi) hi = v; }
+  for (let i = 0; i < datos.length; i++) datos[i] = (datos[i] - lo) / (hi - lo || 1);
+  return datos;
+}
+
+// Tiempo de escape del conjunto de Julia z → z² + c, suavizado
+function datasetJulia(cr, ci, W, H) {
+  const d = new Float32Array(W * H), maxIter = 200, escala = 3.0 / H;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      let zr = (x - W / 2) * escala, zi = (y - H / 2) * escala, it = 0;
+      while (it < maxIter && zr * zr + zi * zi < 256) {
+        const t = zr * zr - zi * zi + cr;
+        zi = 2 * zr * zi + ci;
+        zr = t;
+        it++;
+      }
+      d[y * W + x] = it >= maxIter ? 0 : it + 1 - Math.log2(Math.log(Math.hypot(zr, zi)));
+    }
+  }
+  return normalizar(d);
+}
+
+// Ruido de valor: valores pseudoaleatorios en una grilla, interpolados suavemente
+function hashGrilla(ix, iy, semilla) {
+  let h = Math.imul(ix, 374761393) ^ Math.imul(iy, 668265263) ^ Math.imul(semilla, 2246822519);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+function ruidoValor(x, y, s) {
+  const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+  const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+  const a = hashGrilla(ix, iy, s), b = hashGrilla(ix + 1, iy, s);
+  const c = hashGrilla(ix, iy + 1, s), d = hashGrilla(ix + 1, iy + 1, s);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+// Suma de octavas: cada una con el doble de frecuencia y la mitad de amplitud
+function ruidoFractal(x, y, s, octavas = 6) {
+  let suma = 0, amp = 1, norma = 0;
+  for (let o = 0; o < octavas; o++) {
+    suma += amp * ruidoValor(x, y, s + o * 101);
+    norma += amp; amp *= 0.5; x *= 2; y *= 2;
+  }
+  return suma / norma;
+}
+
+function datasetAltitud(semilla, W, H) {
+  const d = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const nx = x / W - 0.5, ny = y / H - 0.5;
+      const isla = 1 - 1.6 * Math.sqrt(1.2 * nx * nx + 2.2 * ny * ny);
+      d[y * W + x] = 0.85 * ruidoFractal(x / 90, y / 90, semilla) + 0.45 * isla;
+    }
+  }
+  return normalizar(d);
+}
+
+function datasetTemperatura(semilla, W, H) {
+  const d = new Float32Array(W * H), focos = [];
+  for (let k = 0; k < 7; k++) {
+    const r = j => hashGrilla(k, j, semilla);
+    focos.push([r(1) * W, r(2) * H, 30 + 70 * r(3), 0.9 * (r(4) - 0.45)]);
+  }
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      let v = 1 - 1.7 * Math.abs(y / H - 0.55);   // más cálido cerca del "ecuador"
+      for (const [fx, fy, radio, amp] of focos) {
+        const dx = x - fx, dy = y - fy;
+        v += amp * Math.exp(-(dx * dx + dy * dy) / (2 * radio * radio));
+      }
+      d[y * W + x] = v + 0.25 * ruidoFractal(x / 60, y / 60, semilla + 3, 4);
+    }
+  }
+  return normalizar(d);
+}
+
+// Paleta por paradas de color: interpolación lineal entre las dos vecinas
+function interpolarParadas(paradas) {
+  const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const P = paradas.map(([t, hex]) => [t, rgb(hex)]);
+  return t => {
+    for (let k = 1; k < P.length; k++) {
+      if (t <= P[k][0]) {
+        const [t0, c0] = P[k - 1], [t1, c1] = P[k];
+        const u = t1 > t0 ? (t - t0) / (t1 - t0) : 0;
+        return c0.map((v, j) => v + (c1[j] - v) * u);
+      }
+    }
+    return P[P.length - 1][1];
+  };
+}
+
+// HSV → RGB (0..255), para el arco iris y las bandas
+function hsvARgb(h, s, v) {
+  h = ((h % 360) + 360) % 360 / 60;
+  const i = Math.floor(h), f = h - i;
+  const p = v * (1 - s), q = v * (1 - s * f), t = v * (1 - s * (1 - f));
+  const sector = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][i];
+  return sector.map(x => x * 255);
+}
+
+const ESCALAS = {
+  lin: v => v,
+  sqrt: v => Math.sqrt(v),
+  log: v => Math.log(1 + 99 * v) / Math.log(100)
+};
+
+function aplicarPaleta(datos, W, H, paleta, escala, niveles, invertir) {
+  // Tabla de 256 colores precalculada con la paleta
+  const tabla = [];
+  for (let k = 0; k < 256; k++) tabla.push(paleta(k / 255));
+  const out = new Uint8ClampedArray(W * H * 4);
+  for (let p = 0; p < W * H; p++) {
+    let v = escala(clamp01(datos[p]));
+    if (niveles > 0) v = Math.min(niveles - 1, Math.floor(v * niveles)) / (niveles - 1);
+    if (invertir) v = 1 - v;
+    const [r, g, b] = tabla[Math.round(v * 255)];
+    out[4 * p] = r; out[4 * p + 1] = g; out[4 * p + 2] = b; out[4 * p + 3] = 255;
+  }
+  return { w: W, h: H, c: 4, d: out };
+}
+
+/* ----- 1.4 Aritmética de píxeles ----- */
+const OPERACIONES = {
+  add: {
+    clamp: (a, b) => Math.min(1, a + b),
+    avg: (a, b) => (a + b) / 2
+  },
+  sub: {
+    clamp: (a, b) => Math.max(0, a - b),
+    avg: (a, b) => (a - b + 1) / 2
+  },
+  mul: (a, b) => a * b,
+  div: (a, b) => b <= 1e-4 ? 1 : Math.min(1, a / b),
+  absd: (a, b) => Math.abs(a - b),
+  light: (a, b) => Math.max(a, b),
+  dark: (a, b) => Math.min(a, b)
+};
+
+// Iguala tamaños tomando el vecino más cercano
+function igualarTamano(img, w, h) {
+  if (img.w === w && img.h === h) return img;
+  const out = makeImg(w, h, img.c);
+  for (let y = 0; y < h; y++) {
+    const sy = Math.min(img.h - 1, Math.floor((y + 0.5) * img.h / h));
+    for (let x = 0; x < w; x++) {
+      const sx = Math.min(img.w - 1, Math.floor((x + 0.5) * img.w / w));
+      for (let k = 0; k < img.c; k++) out.d[(y * w + x) * img.c + k] = img.d[(sy * img.w + sx) * img.c + k];
+    }
+  }
+  return out;
+}
+
+// RGB: la operación se aplica canal por canal
+function combinarRGB(A, B, op) {
+  const C = makeImg(A.w, A.h, 3);
+  for (let p = 0; p < A.w * A.h; p++) {
+    const a = leerRGB(A, p), b = leerRGB(B, p);
+    for (let k = 0; k < 3; k++) C.d[3 * p + k] = clamp01(op(a[k], b[k]));
+  }
+  return C;
+}
+
+// YIQ: se opera la luminancia y se interpola la cromaticidad
+function combinarYIQ(A, B, op) {
+  const C = makeImg(A.w, A.h, 3);
+  for (let p = 0; p < A.w * A.h; p++) {
+    const [Ya, Ia, Qa] = rgbAYiq(...leerRGB(A, p));
+    const [Yb, Ib, Qb] = rgbAYiq(...leerRGB(B, p));
+    const Yc = clamp01(op(Ya, Yb));
+    // IC = (YA·IA + YB·IB) / (YA + YB), y lo mismo con Q
+    const s = Ya + Yb;
+    const Ic = s > 1e-6 ? (Ya * Ia + Yb * Ib) / s : (Ia + Ib) / 2;
+    const Qc = s > 1e-6 ? (Ya * Qa + Yb * Qb) / s : (Qa + Qb) / 2;
+    const [R, G, Bl] = yiqARgb(Yc, Ic, Qc);
+    C.d[3 * p] = R; C.d[3 * p + 1] = G; C.d[3 * p + 2] = Bl;
+  }
+  return C;
+}
+
+// If-lighter / if-darker en YIQ: se queda con el píxel completo según su Y
+function combinarPorLuminancia(A, B, quedarseConElMasClaro) {
+  const C = makeImg(A.w, A.h, 3);
+  for (let p = 0; p < A.w * A.h; p++) {
+    const a = leerRGB(A, p), b = leerRGB(B, p);
+    const Ya = rgbAYiq(...a)[0], Yb = rgbAYiq(...b)[0];
+    const elegido = (Ya > Yb) === quedarseConElMasClaro ? a : b;
+    C.d[3 * p] = elegido[0]; C.d[3 * p + 1] = elegido[1]; C.d[3 * p + 2] = elegido[2];
+  }
+  return C;
+}
+
+/* ----- 2.1 Convolución ----- */
+function dividir(matriz, divisor) {
+  return matriz.map(fila => fila.map(v => v / divisor));
+}
+
+function convolucionar(img, kernel) {
+  const { w, h, d } = img, n = kernel.length, r = Math.floor(n / 2);
+  const out = makeImg(w, h, 1);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let suma = 0;
+      for (let j = 0; j < n; j++) {
+        // Fuera de la imagen se repite la fila o columna del borde
+        const yy = Math.min(h - 1, Math.max(0, y + j - r));
+        for (let i = 0; i < n; i++) {
+          const xx = Math.min(w - 1, Math.max(0, x + i - r));
+          suma += kernel[j][i] * d[yy * w + xx];
+        }
+      }
+      out.d[y * w + x] = suma;
+    }
+  }
+  return out;
+}
+
+const MOSTRAR = {
+  clamp: v => clamp01(v),
+  abs: v => Math.min(1, Math.abs(v)),
+  mid: v => clamp01(0.5 + v)
+};
+
+/* ----- 2.2 Morfología en grises ----- */
+// Recorre vecindades 3×3 (con bordes repetidos) y reduce sus 9 valores a uno
+function vecindad3x3(img, reducir) {
+  const { w, h, d } = img, out = makeImg(w, h, 1), v = new Float32Array(9);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let k = 0;
+      for (let j = -1; j <= 1; j++) {
+        const yy = Math.min(h - 1, Math.max(0, y + j));
+        for (let i = -1; i <= 1; i++) {
+          const xx = Math.min(w - 1, Math.max(0, x + i));
+          v[k++] = d[yy * w + xx];
+        }
+      }
+      out.d[y * w + x] = reducir(v);
+    }
+  }
+  return out;
+}
+
+function minimo(v) {
+  let m = v[0];
+  for (let i = 1; i < 9; i++) if (v[i] < m) m = v[i];
+  return m;
+}
+function maximo(v) {
+  let m = v[0];
+  for (let i = 1; i < 9; i++) if (v[i] > m) m = v[i];
+  return m;
+}
+// Ordenamiento por inserción de los 9 valores; la mediana es el quinto
+function mediana(v) {
+  for (let i = 1; i < 9; i++) {
+    const x = v[i];
+    let j = i - 1;
+    while (j >= 0 && v[j] > x) { v[j + 1] = v[j]; j--; }
+    v[j + 1] = x;
+  }
+  return v[4];
+}
+
+const erosion = img => vecindad3x3(img, minimo);
+const dilatacion = img => vecindad3x3(img, maximo);
+
+function restar(A, B) {
+  const out = makeImg(A.w, A.h, 1);
+  for (let p = 0; p < A.d.length; p++) out.d[p] = clamp01(A.d[p] - B.d[p]);
+  return out;
+}
+
+const MORFOLOGIA = {
+  ero: { nombre: "Erosión", f: img => erosion(img), usa: [vecindad3x3, minimo] },
+  dil: { nombre: "Dilatación", f: img => dilatacion(img), usa: [vecindad3x3, maximo] },
+  open: { nombre: "Apertura", f: img => dilatacion(erosion(img)), usa: [vecindad3x3, minimo, maximo] },
+  close: { nombre: "Cierre", f: img => erosion(dilatacion(img)), usa: [vecindad3x3, minimo, maximo] },
+  bext: { nombre: "Borde exterior", f: img => restar(dilatacion(img), img), usa: [restar, vecindad3x3, maximo] },
+  bint: { nombre: "Borde interior", f: img => restar(img, erosion(img)), usa: [restar, vecindad3x3, minimo] },
+  grad: { nombre: "Gradiente", f: img => restar(dilatacion(img), erosion(img)), usa: [restar, vecindad3x3, minimo, maximo] },
+  med: { nombre: "Mediana", f: img => vecindad3x3(img, mediana), usa: [vecindad3x3, mediana] },
+  top: { nombre: "Top-hat", f: img => restar(img, dilatacion(erosion(img))), usa: [restar, vecindad3x3, minimo, maximo] }
+};
+
+/* ----- 2.3 Remuestreo y cuantización ----- */
+// Convolución cúbica con a = −1 evaluada en el punto medio entre dos muestras
+const PESOS_CUBICOS = [-1 / 8, 5 / 8, 5 / 8, -1 / 8];
+
+// Reduce a la mitad una fila o columna de `largo` muestras
+function reducir1D(leer, largo, kernel) {
+  const out = new Float32Array(Math.floor(largo / 2));
+  const m = k => leer(Math.min(largo - 1, Math.max(0, k)));
+  for (let i = 0; i < out.length; i++) {
+    const k = 2 * i;
+    if (kernel === "const") out[i] = m(k);                        // sample and hold
+    else if (kernel === "bil") out[i] = (m(k) + m(k + 1)) / 2;    // centro del bloque 2×2
+    else out[i] = PESOS_CUBICOS[0] * m(k - 1) + PESOS_CUBICOS[1] * m(k)
+               + PESOS_CUBICOS[2] * m(k + 1) + PESOS_CUBICOS[3] * m(k + 2);
+  }
+  return out;
+}
+
+// Duplica una fila o columna: las posiciones pares copian, las impares interpolan
+function ampliar1D(leer, largo, kernel) {
+  const out = new Float32Array(largo * 2);
+  const m = k => leer(Math.min(largo - 1, Math.max(0, k)));
+  for (let i = 0; i < out.length; i++) {
+    const k = Math.floor(i / 2);
+    if (i % 2 === 0 || kernel === "const") out[i] = m(k);
+    else if (kernel === "bil") out[i] = (m(k) + m(k + 1)) / 2;
+    else out[i] = PESOS_CUBICOS[0] * m(k - 1) + PESOS_CUBICOS[1] * m(k)
+               + PESOS_CUBICOS[2] * m(k + 1) + PESOS_CUBICOS[3] * m(k + 2);
+  }
+  return out;
+}
+
+// Separable: primero todas las filas, después todas las columnas
+function remuestrear(canal, kernel, paso1D) {
+  const { w, h, d } = canal;
+  const filas = [];
+  for (let y = 0; y < h; y++) filas.push(paso1D(x => d[y * w + x], w, kernel));
+  const W2 = filas[0].length;
+  const tmp = makeImg(W2, h, 1);
+  filas.forEach((f, y) => tmp.d.set(f, y * W2));
+  let out = null;
+  for (let x = 0; x < W2; x++) {
+    const col = paso1D(y => tmp.d[y * W2 + x], h, kernel);
+    if (!out) out = makeImg(W2, col.length, 1);
+    for (let y = 0; y < col.length; y++) out.d[y * W2 + x] = clamp01(col[y]);
+  }
+  return out;
+}
+
+// Niveles posibles: {0, 1/(n−1), 2/(n−1), …, 1}
+const nivelMasCercano = (v, n) => Math.round(clamp01(v) * (n - 1)) / (n - 1);
+
+function cuantizarUniforme(Y, n) {
+  const out = makeImg(Y.w, Y.h, 1);
+  for (let p = 0; p < Y.d.length; p++) out.d[p] = nivelMasCercano(Y.d[p], n);
+  return out;
+}
+
+function cuantizarDitherAleatorio(Y, n) {
+  const out = makeImg(Y.w, Y.h, 1), escalon = 1 / (n - 1);
+  for (let p = 0; p < Y.d.length; p++) {
+    const ruido = (Math.random() - 0.5) * escalon;
+    out.d[p] = nivelMasCercano(Y.d[p] + ruido, n);
+  }
+  return out;
+}
+
+// El error acumulado de la fila se suma a la entrada del píxel siguiente
+function cuantizarScanline(Y, n) {
+  const out = makeImg(Y.w, Y.h, 1);
+  for (let y = 0; y < Y.h; y++) {
+    let error = 0;
+    for (let x = 0; x < Y.w; x++) {
+      const entrada = Y.d[y * Y.w + x] + error;
+      const salida = nivelMasCercano(entrada, n);
+      out.d[y * Y.w + x] = salida;
+      error = entrada - salida;
+    }
+  }
+  return out;
+}
+
+// Floyd–Steinberg: reparte el error 7/16, 3/16, 5/16 y 1/16 entre los vecinos
+function cuantizarFloydSteinberg(Y, n) {
+  const { w, h } = Y, e = Float32Array.from(Y.d), out = makeImg(w, h, 1);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const p = y * w + x, salida = nivelMasCercano(e[p], n), err = e[p] - salida;
+      out.d[p] = salida;
+      if (x + 1 < w) e[p + 1] += err * 7 / 16;
+      if (y + 1 < h) {
+        if (x > 0) e[p + w - 1] += err * 3 / 16;
+        e[p + w] += err * 5 / 16;
+        if (x + 1 < w) e[p + w + 1] += err * 1 / 16;
+      }
+    }
+  }
+  return out;
+}
+
+/* =====================================================================
+   Panel de código en vivo
+   ===================================================================== */
+// Código fuente de una función, sin la sangría que tiene dentro del archivo
+function fuente(fn, nombre) {
+  const lines = fn.toString().split("\n");
+  const sang = l => l.match(/^ */)[0].length;
+  const ind = Math.min(99, ...lines.slice(1).filter(l => l.trim()).map(sang));
+  const body = [lines[0], ...lines.slice(1).map(l => l.slice(Math.min(ind, sang(l))))].join("\n");
+  return nombre && !/^function\b/.test(body) ? `const ${nombre} = ${body};` : body;
+}
+const matrizTxt = m => "[\n" + m.map(r => "  [" + r.map(v => String(v)).join(", ") + "]").join(",\n") + "\n]";
+const kernelTxt = m => {
+  const w = Math.max(...m.flat().map(v => String(v).length));
+  return "[\n" + m.map(r => "  [" + r.map(v => String(v).padStart(w)).join(", ") + "]").join(",\n") + "\n]";
+};
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const RE_TOKENS = /(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|\b(const|let|var|function|return|for|of|in|if|else|while|new|true|false|null|break|continue|typeof)\b|(\b\d+(?:\.\d+)?(?:e-?\d+)?\b)|([A-Za-z_$][\w$]*)(?=\s*\()/g;
+function resaltarLinea(line) {
+  let out = "", last = 0, m;
+  RE_TOKENS.lastIndex = 0;
+  while ((m = RE_TOKENS.exec(line))) {
+    out += esc(line.slice(last, m.index));
+    const cls = m[1] ? "tk-com" : m[2] ? "tk-str" : m[3] ? "tk-kw" : m[4] ? "tk-num" : "tk-fn";
+    out += `<span class="${cls}">${esc(m[0])}</span>`;
+    last = RE_TOKENS.lastIndex;
+  }
+  return out + esc(line.slice(last));
+}
+
+const codePanels = {};
+function initCodePanels() {
+  ["e11", "e12", "e13", "e14", "e21", "e22", "e23"].forEach(id => {
+    $("#codehost").insertAdjacentHTML("beforeend", `<section class="codecard" data-tab="${id}" aria-labelledby="${id}-codet" hidden>
+      <div class="codehead">
+        <div>
+          <h3 id="${id}-codet">Código en ejecución</h3>
+          <p>Todos los algoritmos están implementados a mano, píxel por píxel, sin bibliotecas de procesamiento. Este es el código fuente real de las funciones que están procesando la imagen, con los parámetros elegidos.</p>
+        </div>
+      </div>
+      <div class="codebox">
+        <pre class="code" id="${id}-code" tabindex="0" aria-label="Código fuente en ejecución"></pre>
+        <button class="copyfab" type="button" data-copy="${id}" aria-label="Copiar código" title="Copiar código">
+          <svg class="ic-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          <svg class="ic-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        </button>
+      </div>
+    </section>`);
+    codePanels[id] = { prev: null, text: "" };
+  });
+  document.addEventListener("click", async e => {
+    const b = e.target.closest("[data-copy]"); if (!b) return;
+    const id = b.dataset.copy;
+    try { await navigator.clipboard.writeText(codePanels[id].text); b.classList.add("ok"); b.title = "Copiado"; }
+    catch (err) { const r = document.createRange(); r.selectNodeContents($(`#${id}-code`)); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.title = "Código seleccionado: usá Ctrl+C"; }
+    setTimeout(() => { b.classList.remove("ok"); b.title = "Copiar código"; }, 1600);
+  });
+}
+function setCode(id, parts) {
+  const text = parts.filter(Boolean).join("\n\n");
+  const P = codePanels[id]; if (P.text === text) return;
+  const lines = text.split("\n"), prev = P.prev, count = new Map();
+  if (prev) prev.forEach(l => count.set(l, (count.get(l) || 0) + 1));
+  const pre = $(`#${id}-code`);
+  pre.innerHTML = lines.map(l => {
+    let chg = false;
+    if (prev) { const c = count.get(l) || 0; if (c > 0) count.set(l, c - 1); else chg = l.trim() !== ""; }
+    return `<span class="ln${chg ? " chg" : ""}">${resaltarLinea(l) || " "}</span>`;
+  }).join("");
+  P.prev = lines; P.text = text;
+  // Llevar a la vista la primera línea que cambió (sin animación)
+  const first = $(".ln.chg", pre);
+  if (first && !pre.closest("[hidden]")) {
+    const top = first.getBoundingClientRect().top - pre.getBoundingClientRect().top + pre.scrollTop;
+    const bottom = top + first.offsetHeight;
+    if (top < pre.scrollTop || bottom > pre.scrollTop + pre.clientHeight) pre.scrollTop = Math.max(0, top - 48);
+  }
+  requestAnimationFrame(() => requestAnimationFrame(() => $$(".ln.chg", pre).forEach(el => el.classList.remove("chg"))));
+}
+const num = (v, d = 2) => (+v).toFixed(d);
+
+/* =====================================================================
+   Interfaz
+   ===================================================================== */
+const lumCache = new WeakMap();
+function lumDe(img) { if (img.c === 1) return img; if (!lumCache.has(img)) lumCache.set(img, luminancia(img)); return lumCache.get(img); }
+function splitChannels(img) {
+  if (img.c === 1) return [img];
+  const n = img.w * img.h, ch = [0, 1, 2].map(() => makeImg(img.w, img.h, 1));
+  for (let p = 0; p < n; p++) for (let k = 0; k < 3; k++) ch[k].d[p] = img.d[3 * p + k];
+  return ch;
+}
+function mergeChannels(ch) {
+  if (ch.length === 1) return ch[0];
+  const { w, h } = ch[0], o = makeImg(w, h, 3);
+  for (let p = 0; p < w * h; p++) for (let k = 0; k < 3; k++) o.d[3 * p + k] = ch[k].d[p];
+  return o;
+}
+function paint(canvas, img) {
+  if (canvas.width !== img.w) canvas.width = img.w;
+  if (canvas.height !== img.h) canvas.height = img.h;
+  const ctx = canvas.getContext("2d"), id = ctx.createImageData(img.w, img.h), p = id.data, s = img.d, n = img.w * img.h;
+  if (img.c === 3) { for (let i = 0; i < n; i++) { p[4 * i] = clamp01(s[3 * i]) * 255 + 0.5; p[4 * i + 1] = clamp01(s[3 * i + 1]) * 255 + 0.5; p[4 * i + 2] = clamp01(s[3 * i + 2]) * 255 + 0.5; p[4 * i + 3] = 255; } }
+  else if (img.c === 4) p.set(img.d);
+  else for (let i = 0; i < n; i++) { const v = clamp01(s[i]) * 255 + 0.5; p[4 * i] = p[4 * i + 1] = p[4 * i + 2] = v; p[4 * i + 3] = 255; }
+  ctx.putImageData(id, 0, 0);
+}
+
+/* ---------- Descarga del resultado ---------- */
+// En el visor de artefactos la descarga pasa por la capacidad "downloads" (el visor pide confirmación);
+// abierto como archivo local, se descarga directamente.
+const descargas = window.claude && window.claude.use
+  ? window.claude.use("downloads").then(d => { if (!d) document.body.classList.add("no-downloads"); return d; }).catch(() => { document.body.classList.add("no-downloads"); return null; })
+  : Promise.resolve("local");
+async function descargarPNG(img, filename, btn) {
+  const c = document.createElement("canvas"); paint(c, img);
+  const blob = await new Promise(r => c.toBlob(r, "image/png"));
+  const d = await descargas;
+  if (d === "local") {
+    const url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.download = filename; a.href = url; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return;
+  }
+  if (!d) return;
+  try { await d.save({ filename, data: blob }); }
+  catch (e) {
+    if (["unavailable", "not_granted", "capability_disabled", "capability_removed"].includes(e && e.code)) document.body.classList.add("no-downloads");
+    else if (e && e.code === "rate_limited") { btn.title = "Hay una descarga pendiente de confirmar"; }
+  }
+}
+
+/* ---------- Escenario de comparación ---------- */
+function makeStage(root, labels, opts = {}) {
+  const compare = opts.compare !== false && labels.length === 2;
+  const st = { imgs: [], mode: "side", zoom: 1, pos: 50 };
+  root.innerHTML = `
+    <div class="stage-bar">
+      <div class="grp">
+        ${compare ? `<div class="seg sm" data-r="mode"><button data-v="side" aria-pressed="true">Lado a lado</button><button data-v="curtain">Cortina</button></div>` : ""}
+        <div class="seg sm" data-r="zoom"><button data-v="1" aria-pressed="true">Ajustar</button><button data-v="2">2×</button><button data-v="4">4×</button></div>
+      </div>
+    </div>
+    <div class="wells" style="--n:${labels.length}">
+      ${labels.map((l, i) => `<figure class="well"><div class="scroller"><canvas></canvas></div><figcaption><span>${l}</span><span class="dim"></span></figcaption></figure>`).join("")}
+    </div>
+    ${compare ? `<figure class="well curtain-well"><div class="scroller"><div class="curtain-inner" tabindex="0" aria-label="Divisor de comparación, usar flechas izquierda y derecha">
+        <canvas class="cA"></canvas><canvas class="cB"></canvas><div class="handle"></div>
+        <span class="tag l">${labels[0]}</span><span class="tag r">${labels[1]}</span>
+      </div></div><figcaption><span>Arrastrá el divisor para comparar</span><span class="dim"></span></figcaption></figure>` : ""}
+    <div class="stage-actions">
+      <button class="btn" data-r="apply" type="button">Aplicar</button>
+      <button class="btn" data-r="dl" type="button">Descargar</button>
+    </div>`;
+  const wells = $$(".wells .well", root), canv = wells.map(w => $("canvas", w)), scrollers = $$(".scroller", root);
+  const layout = () => { root.classList.toggle("mode-curtain", st.mode === "curtain"); root.classList.toggle("zoomed", st.zoom > 1); root.style.setProperty("--z", st.zoom); draw(); };
+  if (compare) segInit($('[data-r="mode"]', root), v => { st.mode = v; layout(); });
+  segInit($('[data-r="zoom"]', root), v => { st.zoom = +v; layout(); });
+  let syncing = false;
+  scrollers.forEach(sc => sc.addEventListener("scroll", () => {
+    if (syncing) return; syncing = true;
+    const fx = sc.scrollLeft / Math.max(1, sc.scrollWidth - sc.clientWidth), fy = sc.scrollTop / Math.max(1, sc.scrollHeight - sc.clientHeight);
+    scrollers.forEach(o => { if (o !== sc) { o.scrollLeft = fx * (o.scrollWidth - o.clientWidth); o.scrollTop = fy * (o.scrollHeight - o.clientHeight); } });
+    requestAnimationFrame(() => syncing = false);
+  }));
+  // Con zoom 2× o 4×, arrastrar con la manito desplaza la vista
+  scrollers.forEach(sc => {
+    let pan = null;
+    sc.addEventListener("pointerdown", e => {
+      if (!root.classList.contains("zoomed") || e.button !== 0) return;
+      e.preventDefault();
+      pan = { x: e.clientX, y: e.clientY, l: sc.scrollLeft, t: sc.scrollTop };
+      sc.setPointerCapture(e.pointerId); sc.classList.add("panning");
+    });
+    sc.addEventListener("pointermove", e => {
+      if (!pan) return;
+      sc.scrollLeft = pan.l - (e.clientX - pan.x);
+      sc.scrollTop = pan.t - (e.clientY - pan.y);
+    });
+    const end = () => { pan = null; sc.classList.remove("panning"); };
+    sc.addEventListener("pointerup", end); sc.addEventListener("pointercancel", end);
+  });
+  if (compare) {
+    const inner = $(".curtain-inner", root), cB = $(".cB", root), handle = $(".handle", root);
+    const setPos = p => { st.pos = clampi(p, 0, 100); cB.style.clipPath = `inset(0 0 0 ${st.pos}%)`; handle.style.left = st.pos + "%"; };
+    setPos(50);
+    const move = e => { const r = inner.getBoundingClientRect(); setPos((e.clientX - r.left) / r.width * 100); };
+    // Sin zoom, arrastrar en cualquier lugar mueve el divisor; con zoom, solo desde el divisor (el resto desplaza)
+    inner.addEventListener("pointerdown", e => {
+      if (root.classList.contains("zoomed") && !e.target.closest(".handle")) return;
+      e.stopPropagation(); inner.setPointerCapture(e.pointerId); move(e);
+    });
+    inner.addEventListener("pointermove", e => { if (inner.hasPointerCapture(e.pointerId)) move(e); });
+    inner.addEventListener("keydown", e => { if (e.key === "ArrowLeft") { setPos(st.pos - 5); e.preventDefault(); } if (e.key === "ArrowRight") { setPos(st.pos + 5); e.preventDefault(); } });
+  }
+  $$('[data-r="apply"]', root).forEach(btn => btn.addEventListener("click", () => {
+    const img = st.imgs[st.imgs.length - 1]; if (!img || btn.disabled) return;
+    aplicarResultado(img);
+  }));
+  $$('[data-r="dl"]', root).forEach(btn => btn.addEventListener("click", () => {
+    const img = st.imgs[st.imgs.length - 1]; if (!img) return;
+    descargarPNG(img, `${opts.file || "resultado"}_${App.current ? App.current.id : "imagen"}.png`, btn);
+  }));
+  function draw() {
+    if (st.mode === "curtain" && compare) { if (st.imgs[0]) paint($(".cA", root), st.imgs[0]); if (st.imgs[1]) paint($(".cB", root), st.imgs[1]); }
+    else st.imgs.forEach((img, i) => { if (img) paint(canv[i], img); });
+    const puede = opts.canApply ? opts.canApply() : true;
+    $$('[data-r="apply"]', root).forEach(b => { b.disabled = !puede; b.title = puede ? "Reemplazar la imagen de origen por el resultado" : (opts.applyHint || "No disponible"); });
+    $$('[data-r="dl"]', root).forEach(b => { b.title = "Descargar el resultado en PNG"; });
+    requestAnimationFrame(() => $$("canvas", root).forEach(c => c.classList.toggle("px", c.clientWidth >= c.width - 0.5)));
+  }
+  return {
+    set(i, img, dim) { st.imgs[i] = img; $(".dim", wells[i]).textContent = dim ?? `${img.w} × ${img.h} px`; },
+    draw,
+    setLabel(i, t) { $("figcaption span", wells[i]).textContent = t; const tag = $$(".tag", root)[i]; if (tag) tag.textContent = t; }
+  };
+}
+
+/* ---------- Controles ---------- */
+function segInit(el, onChange) {
+  $$("button", el).forEach(b => { b.type = "button"; if (!b.hasAttribute("aria-pressed")) b.setAttribute("aria-pressed", "false"); });
+  el.addEventListener("click", e => { const b = e.target.closest("button"); if (!b || b.disabled || !el.contains(b)) return; segSet(el, b.dataset.v); onChange && onChange(b.dataset.v); });
+  const cur = el.querySelector('[aria-pressed="true"]'); el.dataset.value = cur ? cur.dataset.v : "";
+}
+function segSet(el, v) { $$("button", el).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === v))); el.dataset.value = v ?? ""; }
+const segVal = el => el.dataset.value;
+function bindRange(input, output, f, cb) { const up = () => { output.textContent = f(+input.value); }; input.addEventListener("input", () => { up(); cb(); }); up(); return up; }
+
+/* ---------- Gráficos ---------- */
+function setupChart(c) {
+  const dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  const ctx = c.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.font = '12px "Geist", system-ui, sans-serif';
+  return { ctx, w, h };
+}
+const tip = $("#tip");
+function showTip(e, html) { tip.innerHTML = html; tip.style.opacity = 1; tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 30) + "px"; }
+function hideTip() { tip.style.opacity = 0; }
+const dec = t => String(t).replace(".", ",");
+function drawHistogram(c, hist, yMax, color, title) {
+  const { ctx, w, h } = setupChart(c), m = { l: 52, r: 8, t: 18, b: 20 }, pw = w - m.l - m.r, ph = h - m.t - m.b, n = hist.length;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = cssVar("--ink-2"); ctx.fillText(title, m.l, 12);
+  ctx.strokeStyle = cssVar("--grid"); ctx.lineWidth = 1; ctx.fillStyle = cssVar("--muted"); ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  [0, 0.5, 1].forEach(f => { const y = m.t + ph - f * ph, v = f * yMax * 100; ctx.beginPath(); ctx.moveTo(m.l, y + .5); ctx.lineTo(w - m.r, y + .5); ctx.stroke(); ctx.fillText(v.toLocaleString("es-AR", { maximumFractionDigits: v >= 10 ? 0 : 1 }) + " %", m.l - 6, y); });
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  [0, 0.25, 0.5, 0.75, 1].forEach(f => ctx.fillText(dec(f), m.l + f * pw, h - m.b + 5));
+  const bw = pw / n, gap = bw > 5 ? 2 : (bw > 2.5 ? 1 : 0);
+  ctx.fillStyle = color;
+  for (let i = 0; i < n; i++) {
+    const bh = hist[i] / (yMax || 1) * ph; if (bh <= 0) continue;
+    const x = m.l + i * bw + gap / 2, ww = Math.max(0.8, bw - gap);
+    ctx.beginPath(); if (ctx.roundRect && ww > 6) ctx.roundRect(x, m.t + ph - bh, ww, bh, [Math.min(3, bh), Math.min(3, bh), 0, 0]); else ctx.rect(x, m.t + ph - bh, ww, bh); ctx.fill();
+  }
+  c.onmousemove = e => { const r = c.getBoundingClientRect(), i = Math.floor((e.clientX - r.left - m.l) / bw); if (i < 0 || i >= n) return hideTip(); showTip(e, `${title}: Y en [${fmt(i / n)}, ${fmt((i + 1) / n)}) → <b>${pct(hist[i])}</b>`); };
+  c.onmouseleave = hideTip;
+}
+function drawTransfer(c, f, guides) {
+  const { ctx, w, h } = setupChart(c), m = { l: 40, r: 12, t: 10, b: 24 }, s = Math.min(w - m.l - m.r, h - m.t - m.b), ox = m.l, oy = m.t + s;
+  ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = cssVar("--grid"); ctx.fillStyle = cssVar("--muted"); ctx.lineWidth = 1; ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  [0, 0.25, 0.5, 0.75, 1].forEach(t => { ctx.beginPath(); ctx.moveTo(ox, oy - t * s + .5); ctx.lineTo(ox + s, oy - t * s + .5); ctx.stroke(); ctx.fillText(dec(t), ox - 6, oy - t * s); });
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  [0, 0.25, 0.5, 0.75, 1].forEach(t => ctx.fillText(dec(t), ox + t * s, oy + 6));
+  ctx.textAlign = "left"; ctx.fillText("Y", ox + s + 4, oy - 6);
+  ctx.setLineDash([4, 4]); ctx.strokeStyle = cssVar("--series-a"); ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + s, oy - s); ctx.stroke(); ctx.setLineDash([]);
+  if (guides) { ctx.strokeStyle = cssVar("--line-2"); guides.forEach(g => { ctx.beginPath(); ctx.moveTo(ox + g * s + .5, oy); ctx.lineTo(ox + g * s + .5, oy - s); ctx.stroke(); }); }
+  ctx.strokeStyle = cssVar("--accent"); ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i <= 200; i++) { const x = i / 200, y = clamp01(f(x)); i ? ctx.lineTo(ox + x * s, oy - y * s) : ctx.moveTo(ox + x * s, oy - y * s); }
+  ctx.stroke();
+  c.onmousemove = e => { const r = c.getBoundingClientRect(), x = (e.clientX - r.left - ox) / s; if (x < 0 || x > 1) return hideTip(); showTip(e, `f(${fmt(x)}) = <b>${fmt(clamp01(f(x)), 3)}</b>`); };
+  c.onmouseleave = hideTip;
+}
+
+/* ---------- Estado global ---------- */
+const App = { images: [], current: null, tabs: {}, active: null };
+let pending = false;
+function schedule() { if (pending) return; pending = true; requestAnimationFrame(() => { pending = false; const t = App.tabs[App.active]; if (t && App.current) t.render(); }); }
+
+async function decodeToImg(src, maxSide = 640) {
+  const im = new Image(); im.src = src; await im.decode();
+  const s = Math.min(1, maxSide / Math.max(im.naturalWidth, im.naturalHeight));
+  const w = Math.max(1, Math.round(im.naturalWidth * s)), h = Math.max(1, Math.round(im.naturalHeight * s));
+  // Solo decodificación del archivo; el procesamiento empieza después.
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const ctx = c.getContext("2d"); ctx.drawImage(im, 0, 0, w, h);
+  const p = ctx.getImageData(0, 0, w, h).data, n = w * h;
+  let gray = true; for (let i = 0; i < n && gray; i += 7) if (p[4 * i] !== p[4 * i + 1] || p[4 * i + 1] !== p[4 * i + 2]) gray = false;
+  const img = makeImg(w, h, gray ? 1 : 3);
+  if (gray) for (let i = 0; i < n; i++) img.d[i] = p[4 * i] / 255;
+  else for (let i = 0; i < n; i++) { img.d[3 * i] = p[4 * i] / 255; img.d[3 * i + 1] = p[4 * i + 1] / 255; img.d[3 * i + 2] = p[4 * i + 2] / 255; }
+  return img;
+}
+function zonePlate(N = 384) {
+  const img = makeImg(N, N, 1);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const dx = x - N / 2 + 0.5, dy = y - N / 2 + 0.5; img.d[y * N + x] = 0.5 + 0.5 * Math.cos(Math.PI * (dx * dx + dy * dy) / N); }
+  return img;
+}
+const ICON_X = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+const ICON_UNDO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>`;
+function addThumb(entry, select) {
+  const grid = $("#imgs"), b = document.createElement("button");
+  b.className = "thumb"; b.type = "button"; b.dataset.id = entry.id; b.setAttribute("aria-pressed", "false");
+  const c = document.createElement("canvas"); paint(c, entry.img);
+  b.append(c, document.createTextNode(entry.label));
+  b.addEventListener("click", () => { App.tabs.e13.onPick(); setCurrent(entry.id); });
+  const node = document.createElement("div"); node.className = "thumbwrap";
+  const ovl = document.createElement("div"); ovl.className = "thumb-ovl";
+  const act = (cls, label, icon, fn) => { const x = document.createElement("button"); x.type = "button"; x.className = "thumb-act " + cls; x.title = label; x.setAttribute("aria-label", `${label}: ${entry.label}`); x.innerHTML = icon; x.addEventListener("click", fn); ovl.append(x); };
+  // Las imágenes propias se pueden quitar; cualquier imagen con un resultado aplicado se puede restaurar
+  if (entry.user) act("rm", "Quitar imagen", ICON_X, () => removeImage(entry.id, node));
+  act("undo", "Restaurar imagen original", ICON_UNDO, () => restaurarImagen(entry));
+  node.append(b, ovl);
+  entry.node = node; entry.thumbCanvas = c;
+  if (entry.user) $(".thumb.add", grid).after(node); else grid.append(node);
+  App.images.push(entry);
+  App.tabs.e14 && App.tabs.e14.refreshList();
+  if (select) { App.tabs.e13.onPick(); setCurrent(entry.id); }
+}
+function removeImage(id, node) {
+  App.images = App.images.filter(e => e.id !== id);
+  node.remove();
+  App.tabs.e14.refreshList();
+  if (App.current && App.current.id === id) setCurrent(App.images[0].id);
+  else schedule();
+}
+// "Aplicar": el resultado pasa a ser la imagen de origen (la original se guarda para poder restaurarla)
+function aplicarResultado(res) {
+  const e = App.current; if (!e) return;
+  let img;
+  if (res.c === 4) { img = makeImg(res.w, res.h, 3); for (let p = 0; p < res.w * res.h; p++) for (let k = 0; k < 3; k++) img.d[3 * p + k] = res.d[4 * p + k] / 255; }
+  else { img = makeImg(res.w, res.h, res.c); img.d.set(res.d); }
+  if (!e.original) e.original = e.img;
+  e.img = img;
+  paint(e.thumbCanvas, img); e.node.classList.add("modified");
+  setCurrent(e.id);
+}
+function restaurarImagen(e) {
+  if (!e.original) return;
+  e.img = e.original; delete e.original;
+  paint(e.thumbCanvas, e.img); e.node.classList.remove("modified");
+  if (App.current === e) setCurrent(e.id); else schedule();
+}
+function setCurrent(id) {
+  App.current = App.images.find(e => e.id === id);
+  $$("#imgs .thumb[data-id]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === id)));
+  Object.values(App.tabs).forEach(t => t.onImage && t.onImage());
+  schedule();
+}
+let userCount = 0;
+async function loadFile(file) {
+  if (!file || !file.type.startsWith("image/")) return;
+  const url = URL.createObjectURL(file);
+  try { addThumb({ user: true, id: "user" + (++userCount), label: file.name.replace(/\.[^.]+$/, "").slice(0, 16), img: await decodeToImg(url) }, true); }
+  catch (e) { $("#side-hint").textContent = "No se pudo abrir ese archivo. Probá con PNG o JPG."; }
+  finally { URL.revokeObjectURL(url); }
+}
+
+/* =====================================================================
+   1.1
+   ===================================================================== */
+App.tabs.e11 = (() => {
+  const stage = makeStage($("#e11-stage"), ["Original", "Procesada"], { file: "ej1-1" });
+  const a = $("#e11-a"), b = $("#e11-b");
+  const upA = bindRange(a, $("#e11-ao"), v => fmt(v), schedule), upB = bindRange(b, $("#e11-bo"), v => fmt(v), schedule);
+  $("#e11-presets").addEventListener("click", e => { const c = e.target.closest(".chip"); if (!c) return; a.value = c.dataset.a; b.value = c.dataset.b; upA(); upB(); schedule(); });
+  function render() {
+    const src = App.current.img, A = +a.value, B = +b.value, n = src.w * src.h;
+    const { out, recortesY, recortesIQ } = ajustarLuminanciaSaturacion(src, A, B);
+    stage.set(0, src); stage.set(1, out); stage.draw();
+    const cy = makeImg(src.w, src.h, 1), ci = makeImg(src.w, src.h, 1), cq = makeImg(src.w, src.h, 1);
+    for (let p = 0; p < n; p++) { const [Y, I, Q] = rgbAYiq(out.d[3 * p], out.d[3 * p + 1], out.d[3 * p + 2]); cy.d[p] = Y; ci.d[p] = 0.5 + 0.5 * I / I_MAX; cq.d[p] = 0.5 + 0.5 * Q / Q_MAX; }
+    paint($("#e11-cy"), cy); paint($("#e11-ci"), ci); paint($("#e11-cq"), cq);
+    $("#e11-stat").innerHTML = `Y′ recortada a 1 en <b>${pct(recortesY / n)}</b> de los píxeles.<br>I′ o Q′ recortadas en <b>${pct(recortesIQ / n)}</b>.`;
+    $("#e11-gray").hidden = src.c !== 1;
+    setCode("e11", [
+      `// Parámetros elegidos\nconst a = ${num(A)};   // coeficiente de luminancia\nconst b = ${num(B)};   // coeficiente de saturación`,
+      `// Ejecución sobre la imagen de trabajo\nconst { out, recortesY, recortesIQ } = ajustarLuminanciaSaturacion(imagen, a, b);`,
+      fuente(ajustarLuminanciaSaturacion),
+      `// Matriz RGB → YIQ de la cátedra y su inversa\nconst M_RGB2YIQ = ${matrizTxt(M_RGB2YIQ)};\nconst M_YIQ2RGB = invertir3x3(M_RGB2YIQ);\nconst I_MAX = ${I_MAX}, Q_MAX = ${Q_MAX};`,
+      fuente(rgbAYiq), fuente(yiqARgb), fuente(leerRGB, "leerRGB"), fuente(clamp01, "clamp01"), fuente(invertir3x3)
+    ]);
+  }
+  return { render };
+})();
+
+/* =====================================================================
+   1.2
+   ===================================================================== */
+App.tabs.e12 = (() => {
+  const stage = makeStage($("#e12-stage"), ["Original", "Procesada"], { file: "ej1-2" });
+  const fSeg = $("#e12-f"), bSeg = $("#e12-bins"), mn = $("#e12-min"), mx = $("#e12-max");
+  segInit(fSeg, v => { $("#e12-lin").hidden = v !== "lin"; schedule(); }); segInit(bSeg, schedule);
+  const upMin = bindRange(mn, $("#e12-mino"), v => fmt(v), () => { if (+mn.value >= +mx.value) { mx.value = Math.min(1, +mn.value + 0.01); upMax(); } schedule(); });
+  const upMax = bindRange(mx, $("#e12-maxo"), v => fmt(v), () => { if (+mx.value <= +mn.value) { mn.value = Math.max(0, +mx.value - 0.01); upMin(); } schedule(); });
+  $("#e12-auto").addEventListener("click", () => {
+    const Y = lumDe(App.current.img).d, h = new Uint32Array(1001); Y.forEach(v => h[Math.round(clamp01(v) * 1000)]++);
+    let acc = 0, lo = 0, hi = 1;
+    for (let i = 0; i <= 1000; i++) { acc += h[i]; if (acc >= 0.01 * Y.length) { lo = i / 1000; break; } }
+    acc = 0; for (let i = 1000; i >= 0; i--) { acc += h[i]; if (acc >= 0.01 * Y.length) { hi = i / 1000; break; } }
+    mn.value = lo; mx.value = Math.max(hi, lo + 0.01); upMin(); upMax(); schedule();
+  });
+  function render() {
+    const src = App.current.img, mode = segVal(fSeg), lo = +mn.value, hi = +mx.value, cols = +segVal(bSeg), Y = lumDe(src);
+    let f, filtro;
+    if (mode === "sqrt") { f = filtroRaiz; filtro = [`// Filtro elegido: raíz cuadrada (aclara; no hace falta recortar)\nconst f = filtroRaiz;`, fuente(filtroRaiz, "filtroRaiz")]; }
+    else if (mode === "sq") { f = filtroCuadrado; filtro = [`// Filtro elegido: cuadrado (oscurece; no hace falta recortar)\nconst f = filtroCuadrado;`, fuente(filtroCuadrado, "filtroCuadrado")]; }
+    else if (mode === "lin") { f = filtroLinealATrozos(lo, hi); filtro = [`// Filtro elegido: lineal a trozos\nconst Ymin = ${num(lo)}, Ymax = ${num(hi)};\nconst f = filtroLinealATrozos(Ymin, Ymax);`, fuente(filtroLinealATrozos)]; }
+    else { f = filtroEcualizacion(Y); filtro = [`// Filtro elegido: ecualización (extra)\nconst f = filtroEcualizacion(luminancia(imagen));`, fuente(filtroEcualizacion)]; }
+    const out = aplicarFiltroLuminancia(src, f), Y2 = luminancia(out);
+    stage.set(0, src); stage.set(1, out); stage.draw();
+    const h1 = histograma(Y, cols), h2 = histograma(Y2, cols), yMax = Math.max(...h1, ...h2) * 1.05;
+    drawHistogram($("#e12-h1"), h1, yMax, cssVar("--series-a"), "Original");
+    drawHistogram($("#e12-h2"), h2, yMax, cssVar("--accent"), "Procesada");
+    drawTransfer($("#e12-tf"), f, mode === "lin" ? [lo, hi] : null);
+    let m1 = 0, m2 = 0; for (let p = 0; p < Y.d.length; p++) { m1 += Y.d[p]; m2 += Y2.d[p]; }
+    $("#e12-stat").innerHTML = `Luminancia media: <b>${fmt(m1 / Y.d.length)}</b> → <b>${fmt(m2 / Y.d.length)}</b>`;
+    setCode("e12", [filtro[0],
+      `// Ejecución\nconst procesada = aplicarFiltroLuminancia(imagen, f);\nconst columnas = ${cols};\nconst hOriginal = histograma(luminancia(imagen), columnas);\nconst hProcesada = histograma(luminancia(procesada), columnas);`,
+      filtro[1], fuente(aplicarFiltroLuminancia), fuente(histograma), fuente(luminancia), fuente(rgbAYiq), fuente(yiqARgb)]);
+  }
+  return { render };
+})();
+
+/* =====================================================================
+   1.3
+   ===================================================================== */
+App.tabs.e13 = (() => {
+  const stage = makeStage($("#e13-stage"), ["Niveles de gris", "Arco iris"], { file: "ej1-3",
+    canApply: () => segVal($("#e13-ds")) === "img", applyHint: "Solo se aplica con el dataset Luminancia de la imagen elegida" });
+  const ds = $("#e13-ds"), scale = $("#e13-scale"), lv = $("#e13-lv"), inv = $("#e13-inv"), cSel = $("#e13-c");
+  const syncDs = v => { $("#e13-julia").hidden = v !== "julia"; $("#e13-seedw").hidden = !(v === "terrain" || v === "temp"); };
+  segInit(ds, v => { syncDs(v); schedule(); });
+  segInit(scale, schedule);
+  bindRange(lv, $("#e13-lvo"), v => v === 0 ? "Continua" : Math.max(2, v), schedule);
+  inv.addEventListener("change", schedule); cSel.addEventListener("change", schedule);
+  let seed = 7; const cache = new Map();
+  $("#e13-seed").addEventListener("click", () => { seed = (seed * 9301 + 49297) % 233280; schedule(); });
+  const PALETAS = [
+    { id: "gray", nombre: "Niveles de gris", f: t => [255 * t, 255 * t, 255 * t] },
+    { id: "rainbow", nombre: "Arco iris", f: t => hsvARgb(270 * (1 - t), 1, 1) },
+    { id: "viridis", nombre: "Perceptual", paradas: [[0, "#440154"], [0.25, "#3B528B"], [0.5, "#21918C"], [0.75, "#5EC962"], [1, "#FDE725"]] },
+    { id: "hot", nombre: "Térmica", paradas: [[0, "#000000"], [0.3, "#8B0000"], [0.55, "#FF3D00"], [0.8, "#FFC400"], [1, "#FFFFFF"]] },
+    { id: "terrain", nombre: "Hipsométrica", paradas: [[0, "#0B2A5B"], [0.2, "#1F5FA8"], [0.3, "#86BBE6"], [0.3001, "#D8C99B"], [0.38, "#6AA84F"], [0.55, "#2E6B34"], [0.72, "#8A6A46"], [0.88, "#A3A3A3"], [1, "#FFFFFF"]] },
+    { id: "div", nombre: "Divergente frío–cálido", paradas: [[0, "#2C5AA0"], [0.25, "#8DB4DC"], [0.5, "#F2F2F2"], [0.75, "#E59A8C"], [1, "#B3262E"]] },
+    { id: "bands", nombre: "Bandas cíclicas", f: t => hsvARgb(360 * ((4 * t) % 1), 0.75, 0.55 + 0.45 * t) }
+  ];
+  PALETAS.forEach(p => { if (p.paradas) p.f = interpolarParadas(p.paradas); });
+  let pal = "rainbow";
+  const palsEl = $("#e13-pals");
+  PALETAS.forEach(p => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "palbtn"; b.dataset.id = p.id;
+    const c = document.createElement("canvas"), d = new Float32Array(256); for (let i = 0; i < 256; i++) d[i] = i / 255;
+    paint(c, aplicarPaleta(d, 256, 1, p.f, ESCALAS.lin, 0, false));
+    b.append(c, document.createTextNode(p.nombre)); b.setAttribute("aria-pressed", String(p.id === pal));
+    b.addEventListener("click", () => { pal = p.id; $$(".palbtn", palsEl).forEach(x => x.setAttribute("aria-pressed", String(x.dataset.id === pal))); schedule(); });
+    palsEl.append(b);
+  });
+  const W = 480, H = 360;
+  const META = {
+    julia: { unidad: "Iteraciones hasta escapar (normalizadas)", lo: 0, hi: 1, dec: 2 },
+    terrain: { unidad: "Altitud (m)", lo: -1500, hi: 3500, dec: 0 },
+    temp: { unidad: "Temperatura (°C)", lo: -20, hi: 40, dec: 0 },
+    img: { unidad: "Luminancia Y", lo: 0, hi: 1, dec: 2 }
+  };
+  function datos(kind) {
+    if (kind === "img") { const Y = lumDe(App.current.img); return { w: Y.w, h: Y.h, d: Y.d }; }
+    const key = kind === "julia" ? "j" + cSel.value : kind + seed;
+    if (!cache.has(key)) {
+      let d;
+      if (kind === "julia") { const [cr, ci] = cSel.value.split(",").map(Number); d = datasetJulia(cr, ci, W, H); }
+      else if (kind === "terrain") d = datasetAltitud(seed, W, H);
+      else d = datasetTemperatura(seed, W, H);
+      cache.set(key, { w: W, h: H, d });
+    }
+    return cache.get(key);
+  }
+  function render() {
+    const kind = segVal(ds), D = datos(kind), L = +lv.value, niveles = L === 0 ? 0 : Math.max(2, L), sc = segVal(scale), P = PALETAS.find(p => p.id === pal), M = META[kind];
+    stage.set(0, aplicarPaleta(D.d, D.w, D.h, PALETAS[0].f, ESCALAS[sc], niveles, inv.checked));
+    stage.set(1, aplicarPaleta(D.d, D.w, D.h, P.f, ESCALAS[sc], niveles, inv.checked));
+    stage.setLabel(1, P.nombre); stage.draw();
+    $("#e13-unit").textContent = M.unidad;
+    const c = $("#e13-bar"), { ctx, w } = setupChart(c), bh = 18;
+    const grad = new Float32Array(Math.max(2, Math.round(w))); for (let i = 0; i < grad.length; i++) grad[i] = i / (grad.length - 1);
+    const strip = aplicarPaleta(grad, grad.length, 1, P.f, ESCALAS[sc], niveles, inv.checked);
+    ctx.clearRect(0, 0, w, c.clientHeight);
+    for (let x = 0; x < grad.length; x++) { ctx.fillStyle = `rgb(${strip.d[4 * x]},${strip.d[4 * x + 1]},${strip.d[4 * x + 2]})`; ctx.fillRect(x, 0, 1.5, bh); }
+    ctx.fillStyle = cssVar("--muted"); ctx.textBaseline = "top";
+    [0, 0.25, 0.5, 0.75, 1].forEach((t, i) => { ctx.textAlign = i === 0 ? "left" : i === 4 ? "right" : "center"; ctx.fillText((M.lo + t * (M.hi - M.lo)).toLocaleString("es-AR", { maximumFractionDigits: M.dec, minimumFractionDigits: M.dec }), t * (w - 1), bh + 6); });
+    c.onmousemove = e => { const r = c.getBoundingClientRect(), t = clamp01((e.clientX - r.left) / r.width); showTip(e, `${M.unidad}: <b>${(M.lo + t * (M.hi - M.lo)).toLocaleString("es-AR", { maximumFractionDigits: M.dec || 2 })}</b>`); };
+    c.onmouseleave = hideTip;
+    let dsCode;
+    if (kind === "julia") { const [cr, ci] = cSel.value.split(","); dsCode = [`// Dataset: conjunto de Julia con c = ${cr} + ${ci}i\nconst datos = datasetJulia(${cr}, ${ci}, ${W}, ${H});`, [fuente(datasetJulia), fuente(normalizar)]]; }
+    else if (kind === "terrain") dsCode = [`// Dataset: mapa de altitud sintético (semilla ${seed})\nconst datos = datasetAltitud(${seed}, ${W}, ${H});`, [fuente(datasetAltitud), fuente(ruidoFractal), fuente(ruidoValor), fuente(hashGrilla), fuente(normalizar)]];
+    else if (kind === "temp") dsCode = [`// Dataset: mapa de temperatura sintético (semilla ${seed})\nconst datos = datasetTemperatura(${seed}, ${W}, ${H});`, [fuente(datasetTemperatura), fuente(ruidoFractal), fuente(ruidoValor), fuente(hashGrilla), fuente(normalizar)]];
+    else dsCode = [`// Dataset: luminancia de la imagen elegida, ya en [0, 1]\nconst datos = luminancia(imagen).d;`, [fuente(luminancia)]];
+    const palCode = P.paradas
+      ? `// Paleta: ${P.nombre}\nconst paleta = interpolarParadas([\n${P.paradas.map(([t, h]) => `  [${t}, "${h}"]`).join(",\n")}\n]);`
+      : `// Paleta: ${P.nombre}\nconst paleta = ${fuente(P.f)};`;
+    setCode("e13", [dsCode[0], palCode,
+      `// Escala y niveles\nconst escala = ${fuente(ESCALAS[sc])};   // ${({ lin: "lineal", sqrt: "raíz", log: "logarítmica" })[sc]}\nconst niveles = ${niveles};   // 0 = continua\nconst invertir = ${inv.checked};`,
+      `// Ejecución\nconst visualizacion = aplicarPaleta(datos, ${D.w}, ${D.h}, paleta, escala, niveles, invertir);`,
+      fuente(aplicarPaleta), P.paradas ? fuente(interpolarParadas) : (P.id !== "gray" ? fuente(hsvARgb) : null), ...dsCode[1]]);
+  }
+  // Elegir una imagen en la barra lateral desde esta pestaña la usa como dataset
+  function onPick() { if (App.active === "e13" && segVal(ds) !== "img") { segSet(ds, "img"); syncDs("img"); } }
+  return { render, onPick };
+})();
+
+/* =====================================================================
+   1.4
+   ===================================================================== */
+App.tabs.e14 = (() => {
+  const stage = makeStage($("#e14-stage"), ["A", "B", "C = A ∘ B"], { compare: false, file: "ej1-4" });
+  const bSel = $("#e14-b"), op = $("#e14-op"), sp = $("#e14-sp"), cl = $("#e14-cl");
+  const NOMBRES = { add: "suma", sub: "resta", mul: "producto", div: "cociente", absd: "resta absoluta", light: "if-lighter", dark: "if-darker" };
+  const syncCl = () => { const usa = ["add", "sub"].includes(segVal(op)); $$("button", cl).forEach(b => b.disabled = !usa); $("#e14-clh").textContent = usa ? "" : "Solo se aplica a suma y resta. Las demás operaciones recortan a [0, 1]."; };
+  segInit(op, () => { syncCl(); schedule(); }); segInit(sp, schedule); segInit(cl, schedule); syncCl();
+  bSel.addEventListener("change", schedule);
+  function refreshList() { const cur = bSel.value; bSel.innerHTML = App.images.map(e => `<option value="${e.id}">${e.label}</option>`).join(""); bSel.value = cur && App.images.some(e => e.id === cur) ? cur : "cafe"; }
+  function render() {
+    const A = App.current.img, Be = App.images.find(e => e.id === bSel.value) || App.images[0];
+    const B = igualarTamano(Be.img, A.w, A.h), o = segVal(op), space = segVal(sp), close = segVal(cl);
+    const conCierre = ["add", "sub"].includes(o), fn = conCierre ? OPERACIONES[o][close] : OPERACIONES[o];
+    const opLine = `const op = ${fuente(fn)};   // ${NOMBRES[o]}${conCierre ? (close === "clamp" ? " clampeada" : " promediada") : ""}`;
+    let C, code;
+    if (space === "yiq" && (o === "light" || o === "dark")) {
+      C = combinarPorLuminancia(A, B, o === "light");
+      code = [`// Operación: ${NOMBRES[o]} en YIQ (elige el píxel completo según su luminancia)\nconst quedarseConElMasClaro = ${o === "light"};`,
+        `// Ejecución\nconst C = combinarPorLuminancia(A, igualarTamano(B, A.w, A.h), quedarseConElMasClaro);`, fuente(combinarPorLuminancia), fuente(rgbAYiq)];
+    } else if (space === "yiq") {
+      C = combinarYIQ(A, B, fn);
+      code = [`// Operación: ${NOMBRES[o]} en YIQ (sobre la luminancia)\n${opLine}`,
+        `// Ejecución\nconst C = combinarYIQ(A, igualarTamano(B, A.w, A.h), op);`, fuente(combinarYIQ), fuente(rgbAYiq), fuente(yiqARgb)];
+    } else {
+      C = combinarRGB(A, B, fn);
+      code = [`// Operación: ${NOMBRES[o]} en RGB, canal por canal\n${opLine}`,
+        `// Ejecución\nconst C = combinarRGB(A, igualarTamano(B, A.w, A.h), op);`, fuente(combinarRGB)];
+    }
+    stage.set(0, A); stage.set(1, B, Be.label); stage.set(2, C); stage.draw();
+    setCode("e14", [...code, fuente(igualarTamano), fuente(leerRGB, "leerRGB")]);
+  }
+  return { render, refreshList };
+})();
+
+/* =====================================================================
+   2.1
+   ===================================================================== */
+App.tabs.e21 = (() => {
+  const stage = makeStage($("#e21-stage"), ["Luminancia original", "Filtrada"], { file: "ej2-1" });
+  const groups = [$("#e21-k"), $("#e21-k2"), $("#e21-k3")], ps = $("#e21-ps"), disp = $("#e21-disp"), gIn = $("#e21-g");
+  let kid = "plano";
+  groups.forEach(g => segInit(g, v => { kid = v; groups.forEach(o => { if (o !== g) segSet(o, null); }); sync(); schedule(); }));
+  segInit(ps, schedule); segInit(disp, schedule); bindRange(gIn, $("#e21-go"), v => "×" + v, schedule);
+  const outer = (v, w) => v.map(a => w.map(b => a * b));
+  const g3 = [1, 2, 1], g5 = [1, 4, 6, 4, 1];
+  const KS = {
+    plano: n => ({ nombre: `Pasabajos plano ${n}×${n}: promedio del píxel con sus vecinos`, m: [...Array(n)].map(() => Array(n).fill(1)), div: n * n }),
+    bartlett: () => ({ nombre: "Pasabajos Bartlett 3×3: 1-2-1 por fila y por columna", m: outer(g3, g3), div: 16 }),
+    gauss: () => ({ nombre: "Pasabajos gaussiano 5×5: 1-4-6-4-1 (triángulo de Pascal) por fila y por columna", m: outer(g5, g5), div: 256 }),
+    lap: () => ({ nombre: "Laplaciano v4: segundas diferencias con los 4 vecinos, suma 0", m: [[0, -1, 0], [-1, 4, -1], [0, -1, 0]], div: 1 }),
+    sN: () => ({ nombre: "Sobel norte: transiciones de oscuro a claro hacia arriba", m: [[1, 2, 1], [0, 0, 0], [-1, -2, -1]], div: 1 }),
+    sS: () => ({ nombre: "Sobel sur: transiciones de oscuro a claro hacia abajo", m: [[-1, -2, -1], [0, 0, 0], [1, 2, 1]], div: 1 }),
+    sE: () => ({ nombre: "Sobel este: transiciones de oscuro a claro hacia la derecha", m: [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], div: 1 }),
+    sO: () => ({ nombre: "Sobel oeste: transiciones de oscuro a claro hacia la izquierda", m: [[1, 0, -1], [2, 0, -2], [1, 0, -1]], div: 1 }),
+    dog: () => { const G3 = outer(g3, g3), G5 = outer(g5, g5); return { nombre: "Pasabanda: gaussiano 3×3 (embebido en 5×5) menos gaussiano 5×5", m: G5.map((r, j) => r.map((v, i) => (j >= 1 && j <= 3 && i >= 1 && i <= 3 ? 16 * G3[j - 1][i - 1] : 0) - v)), div: 256 }; },
+    sharp: () => ({ nombre: "Realce (extra): identidad + 0.2·Laplaciano, centro 9/5 y vecinos −1/5", m: [[0, -1, 0], [-1, 9, -1], [0, -1, 0]], div: 5 })
+  };
+  const getK = () => kid === "plano" ? KS.plano(+segVal(ps)) : KS[kid]();
+  const LOW = ["plano", "bartlett", "gauss", "sharp"];
+  function sync() { $("#e21-planow").hidden = kid !== "plano"; const low = LOW.includes(kid); $$("button", disp).forEach(b => b.disabled = low); gIn.disabled = low; }
+  function render() {
+    const Y = lumDe(App.current.img), K = getK(), kernel = dividir(K.m, K.div), low = LOW.includes(kid);
+    const modo = low ? "clamp" : segVal(disp), ganancia = low ? 1 : +gIn.value, mostrar = MOSTRAR[modo];
+    const filtrada = convolucionar(Y, kernel);
+    for (let p = 0; p < filtrada.d.length; p++) filtrada.d[p] = mostrar(ganancia * filtrada.d[p]);
+    stage.set(0, Y); stage.set(1, filtrada); stage.draw();
+    setCode("e21", [
+      `// ${K.nombre}\nconst kernel = dividir(${kernelTxt(K.m)}, ${K.div});`,
+      `// Cómo se muestran los valores\nconst ganancia = ${ganancia};\nconst mostrar = ${fuente(mostrar)};   // ${({ clamp: "recortar a [0, 1]", abs: "valor absoluto", mid: "centrar en gris" })[modo]}`,
+      `// Ejecución\nconst Y = luminancia(imagen);\nconst filtrada = convolucionar(Y, kernel);\nfor (let p = 0; p < filtrada.d.length; p++) filtrada.d[p] = mostrar(ganancia * filtrada.d[p]);`,
+      fuente(convolucionar), fuente(dividir), fuente(luminancia)
+    ]);
+  }
+  sync();
+  return { render };
+})();
+
+/* =====================================================================
+   2.2
+   ===================================================================== */
+App.tabs.e22 = (() => {
+  const stage = makeStage($("#e22-stage"), ["Original de trabajo", "Resultado"], { file: "ej2-2" });
+  const op = $("#e22-op"), str = $("#e22-str");
+  segInit(op, schedule); str.addEventListener("change", schedule);
+  let work = null, history = [], last = null;
+  const reset = () => { work = App.current ? lumDe(App.current.img) : null; history = []; };
+  $("#e22-reset").addEventListener("click", () => { reset(); schedule(); });
+  $("#e22-copy").addEventListener("click", () => { if (!last) return; work = last; history.push(MORFOLOGIA[segVal(op)].nombre); schedule(); });
+  $("#e22-noise").addEventListener("click", () => {
+    if (!work) return; const o = makeImg(work.w, work.h, 1); o.d.set(work.d);
+    for (let i = 0; i < o.d.length; i++) { const r = Math.random(); if (r < 0.03) o.d[i] = 0; else if (r < 0.06) o.d[i] = 1; }
+    work = o; history.push("Ruido sal y pimienta"); schedule();
+  });
+  function render() {
+    if (!work) reset();
+    const M = MORFOLOGIA[segVal(op)];
+    last = M.f(work);
+    let shown = last;
+    if (str.checked) { let mx = 0; for (const v of last.d) if (v > mx) mx = v; if (mx > 0) { shown = makeImg(work.w, work.h, 1); for (let i = 0; i < shown.d.length; i++) shown.d[i] = last.d[i] / mx; } }
+    stage.set(0, work); stage.set(1, shown); stage.draw();
+    $("#e22-hist").innerHTML = ["Imagen inicial", ...history].map(s => `<span class="step">${s}</span>`).join(" → ");
+    const src = M.f.toString();
+    setCode("e22", [
+      `// Operación elegida: ${M.nombre}, elemento estructurante 3×3\nconst operacion = ${fuente(M.f)};`,
+      `// Ejecución ("Copiar resultado al original" reemplaza original por resultado)\nconst resultado = operacion(original);`,
+      /erosion/.test(src) ? fuente(erosion, "erosion") : null,
+      /dilatacion/.test(src) ? fuente(dilatacion, "dilatacion") : null,
+      ...M.usa.map(f => fuente(f))
+    ]);
+  }
+  return { render, onImage: reset };
+})();
+
+/* =====================================================================
+   2.3
+   ===================================================================== */
+App.tabs.e23 = (() => {
+  const stage = makeStage($("#e23-stage"), ["Original", "Resultado"], { file: "ej2-3" });
+  const mode = $("#e23-mode"), k = $("#e23-k"), qm = $("#e23-qm"), nIn = $("#e23-n");
+  const sync = () => { const m = segVal(mode); $("#e23-rs").hidden = m === "quant"; $("#e23-q").hidden = m !== "quant"; };
+  segInit(mode, () => { sync(); schedule(); }); segInit(k, schedule); segInit(qm, schedule);
+  bindRange(nIn, $("#e23-no"), v => v, schedule); sync();
+  const QF = { unif: cuantizarUniforme, rand: cuantizarDitherAleatorio, scan: cuantizarScanline, fs: cuantizarFloydSteinberg };
+  const QN = { unif: "uniforme", rand: "con dithering aleatorio", scan: "con difusión del error por scan-line", fs: "con Floyd–Steinberg" };
+  const KN = { const: "constante", bil: "bilineal", bic: "bicúbico" };
+  function render() {
+    const src = App.current.img, m = segVal(mode);
+    if (m === "quant") {
+      const Y = lumDe(src), n = +nIn.value, metodo = segVal(qm), out = QF[metodo](Y, n);
+      let se = 0; for (let i = 0; i < Y.d.length; i++) { const e = out.d[i] - Y.d[i]; se += e * e; }
+      stage.setLabel(0, "Luminancia original"); stage.setLabel(1, `Cuantizada a ${n} niveles`);
+      stage.set(0, Y); stage.set(1, out); stage.draw();
+      $("#e23-stat").innerHTML = `Error RMS: <b>${fmt(Math.sqrt(se / Y.d.length), 4)}</b>`;
+      setCode("e23", [`// Cuantización ${QN[metodo]} a ${n} niveles de gris\nconst n = ${n};`,
+        `// Ejecución\nconst cuantizada = ${QF[metodo].name}(luminancia(imagen), n);`,
+        fuente(QF[metodo]), fuente(nivelMasCercano, "nivelMasCercano"), fuente(luminancia)]);
+    } else {
+      const kern = segVal(k), paso = m === "down" ? reducir1D : ampliar1D;
+      const out = mergeChannels(splitChannels(src).map(c => remuestrear(c, kern, paso)));
+      stage.setLabel(0, m === "down" ? "Original" : "Original al doble de tamaño");
+      stage.setLabel(1, m === "down" ? "Reducida, mostrada al doble de tamaño" : "Ampliada ×2");
+      stage.set(0, src); stage.set(1, out); stage.draw();
+      $("#e23-stat").innerHTML = `${src.w} × ${src.h} px → <b>${out.w} × ${out.h} px</b>`;
+      setCode("e23", [`// ${m === "down" ? "Downsampling" : "Upsampling"} ×2 con kernel ${KN[kern]}\nconst kernel = "${kern}";`,
+        `// Ejecución: cada canal (R, G y B, o el único canal si es gris) por separado\nconst resultado = canales.map(canal => remuestrear(canal, kernel, ${paso.name}));`,
+        fuente(remuestrear), fuente(paso),
+        kern === "bic" ? `// Convolución cúbica con a = −1 en el punto medio entre dos muestras\nconst PESOS_CUBICOS = [-1 / 8, 5 / 8, 5 / 8, -1 / 8];` : null]);
+    }
+  }
+  return { render };
+})();
+
+/* ---------- Pestañas ---------- */
+const tabs = $$(".tab");
+function activate(id, focus) {
+  App.active = id;
+  tabs.forEach(t => { const on = t.dataset.tab === id; t.setAttribute("aria-selected", String(on)); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
+  $$(".panel-ex").forEach(p => p.hidden = p.id !== id);
+  $$(".codecard").forEach(c => c.hidden = c.dataset.tab !== id);
+  try { history.replaceState(null, "", "#" + id); } catch (e) {}
+  schedule();
+}
+tabs.forEach((t, i) => {
+  t.setAttribute("aria-controls", t.dataset.tab);
+  t.addEventListener("click", () => activate(t.dataset.tab));
+  t.addEventListener("keydown", e => { const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key]; if (d) { e.preventDefault(); activate(tabs[(i + d + tabs.length) % tabs.length].dataset.tab, true); } });
+});
+
+/* ---------- Tema ---------- */
+const themeBtn = $("#themebtn");
+const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+const syncTheme = () => themeBtn.setAttribute("aria-checked", String(isDark()));
+themeBtn.addEventListener("click", () => {
+  document.documentElement.dataset.theme = isDark() ? "light" : "dark";
+  try { localStorage.setItem("lab-theme", document.documentElement.dataset.theme); } catch (e) {}
+});
+try { const t = localStorage.getItem("lab-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { syncTheme(); schedule(); }); } catch (e) {}
+new MutationObserver(() => { syncTheme(); schedule(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+syncTheme();
+
+/* ---------- Ancho del panel de código ---------- */
+(() => {
+  const side = $("#codeside"), handle = $("#resizer"), root = document.documentElement;
+  const MIN = 320, max = () => Math.max(MIN, Math.min(760, Math.round(innerWidth * 0.45)));
+  const set = w => { const v = clampi(Math.round(w), MIN, max()); root.style.setProperty("--code-w", v + "px"); return v; };
+  let saved = 380; try { saved = +localStorage.getItem("lab-code-w") || 380; } catch (e) {}
+  let width = set(saved);
+  const save = () => { try { localStorage.setItem("lab-code-w", String(width)); } catch (e) {} };
+  handle.addEventListener("pointerdown", e => { handle.setPointerCapture(e.pointerId); side.classList.add("resizing"); });
+  handle.addEventListener("pointermove", e => { if (handle.hasPointerCapture(e.pointerId)) { width = set(innerWidth - e.clientX); } });
+  const end = () => { side.classList.remove("resizing"); save(); schedule(); };
+  handle.addEventListener("pointerup", end); handle.addEventListener("pointercancel", end);
+  handle.addEventListener("keydown", e => {
+    const d = { ArrowLeft: 24, ArrowRight: -24 }[e.key]; if (!d) return;
+    e.preventDefault(); width = set(width + d); save(); schedule();
+  });
+  addEventListener("resize", () => { width = set(width); });
+})();
+
+/* ---------- Inicio ---------- */
+initCodePanels();
+(async function init() {
+  const grid = $("#imgs"), add = document.createElement("button");
+  add.className = "thumb add"; add.type = "button";
+  add.innerHTML = `<span class="ph" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 5h6"/><path d="M19 2v6"/><path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/><circle cx="9" cy="9" r="2"/></svg></span>Nueva imagen`;
+  add.addEventListener("click", () => $("#file").click());
+  grid.append(add);
+  $("#file").addEventListener("change", e => { loadFile(e.target.files[0]); e.target.value = ""; });
+  let depth = 0;
+  addEventListener("dragenter", e => { e.preventDefault(); depth++; document.body.classList.add("dragging"); });
+  addEventListener("dragleave", () => { if (--depth <= 0) { depth = 0; document.body.classList.remove("dragging"); } });
+  addEventListener("dragover", e => e.preventDefault());
+  addEventListener("drop", e => { e.preventDefault(); depth = 0; document.body.classList.remove("dragging"); loadFile(e.dataTransfer.files[0]); });
+  for (const d of DEMO_IMAGES) addThumb({ id: d.id, label: d.label, img: await decodeToImg(d.src) }, false);
+  addThumb({ id: "zona", label: "Placa zonal", img: zonePlate() }, false);
+  App.tabs.e14.refreshList();
+  const start = (location.hash || "#e11").slice(1);
+  setCurrent("gato");
+  activate(App.tabs[start] ? start : "e11");
+})();
+addEventListener("resize", () => schedule());
+</script>
+</body>
+</html>
