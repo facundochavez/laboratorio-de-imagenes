@@ -74,6 +74,8 @@ svg.i{width:16px; height:16px; flex:none}
 .top-main{flex:1 1 auto; min-width:0; display:flex; align-items:first baseline; justify-content:space-between; gap:var(--gap-team) 32px; flex-wrap:wrap}
 .brand{display:flex; flex-direction:column; gap:var(--gap-sub); min-width:0}
 .brand h1{font-family:var(--font-display); font-weight:700; font-size:26px; line-height:1.05; letter-spacing:-.025em; margin:0}
+/* Ícono flask-conical (el mismo del favicon) a la izquierda del título, con el azul del tema */
+.brand h1 .logo{width:24px; height:24px; color:var(--accent); vertical-align:-3px; margin-right:6px}
 .brand p{margin:0; color:var(--muted); font-size:14px; line-height:1.4; font-weight:500; text-wrap:balance}
 .brand p span{color:var(--muted)}
 /* space-between: en una línea el grupo va a la derecha (alineado por línea base con el título); si pasa a su propia línea queda solo y space-between lo deja al inicio */
@@ -302,7 +304,7 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
 <header class="top gutter">
   <div class="top-main">
   <div class="brand">
-    <h1>Laboratorio de imágenes</h1>
+    <h1><svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M6.453 15h11.094"/><path d="M8.5 2h7"/></svg>Laboratorio de imágenes</h1>
     <p>Procesamiento de Imágenes, Diplodatos&nbsp;2026 <span>/</span> Trabajos prácticos 1&nbsp;y&nbsp;2</p>
   </div>
   <p class="team"><span class="lbl">Grupo 2:</span> <span class="names"><a href="https://www.facundochavez.dev/es" target="_blank" rel="noopener">Chavez&nbsp;Facundo<svg class="ext" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>, <a href="https://www.linkedin.com/in/marianodroz/" target="_blank" rel="noopener">Droz&nbsp;Mariano&nbsp;Rafael<svg class="ext" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a></span></p>
@@ -343,7 +345,6 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
     <section class="panel-ex" id="e11" role="tabpanel">
       <header class="ex-head">
         <h2>1.1 Luminancia y saturación en YIQ</h2>
-        <p>Cada píxel pasa de RGB a YIQ. Se escala Y con el coeficiente <i>a</i> para cambiar la luminancia, e I y Q con <i>b</i> para cambiar la saturación, y se vuelve a RGB.</p>
       </header>
       <div class="bench">
         <div class="controls">
@@ -384,14 +385,6 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
             <figure><canvas id="e11-cq"></canvas><figcaption>Q, eje violeta–verde (gris = 0)</figcaption></figure>
           </div>
         </div>
-        <div class="card wide">
-          <h3>Qué observar</h3>
-          <ul>
-            <li>Con a &gt; 1 las zonas claras se aplanan: Y no puede pasar de 1 y se pierden detalles. El contador de recortes muestra cuántos píxeles se saturan.</li>
-            <li>Con b = 0 la imagen queda en blanco y negro sin cambiar su luminancia.</li>
-            <li>Subir mucho a o b hace visibles los artefactos de compresión JPEG (bloques de 8×8 en el cielo del astronauta o en el café).</li>
-          </ul>
-        </div>
       </div>
     </section>
 
@@ -399,7 +392,6 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
     <section class="panel-ex" id="e12" role="tabpanel" hidden>
       <header class="ex-head">
         <h2>1.2 Manipulación del histograma de luminancias</h2>
-        <p>Se aplica una función Y′ = f(Y) a la luminancia de cada píxel sin tocar la cromaticidad (I y Q). La raíz aclara, el cuadrado oscurece y la lineal a trozos estira el contraste.</p>
       </header>
       <div class="bench">
         <div class="controls">
@@ -446,14 +438,6 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
             </div>
           </div>
         </div>
-        <div class="card wide">
-          <h3>Qué observar</h3>
-          <ul>
-            <li>Donde la pendiente de f es mayor que 1 las luminancias se separan, y donde es menor se juntan.</li>
-            <li>La raíz mejora imágenes oscuras (la luna, el fotógrafo) y el cuadrado las sobreexpuestas.</li>
-            <li>La lineal a trozos solo funciona bien si Y<sub>mín</sub> e Y<sub>máx</sub> encierran casi todo el histograma. Probá con las monedas, que tienen poco rango dinámico.</li>
-          </ul>
-        </div>
       </div>
     </section>
 
@@ -461,7 +445,6 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
     <section class="panel-ex" id="e13" role="tabpanel" hidden>
       <header class="ex-head">
         <h2>1.3 Visualización de datos 2D con paletas <span class="badge">Optativo</span></h2>
-        <p>Un dataset 2D es una matriz de valores, no una imagen. Para verlo se normaliza a [0, 1] y cada valor se mapea a un color con una paleta. La misma información puede contar historias muy distintas según la paleta.</p>
       </header>
       <div class="bench">
         <div class="controls">
@@ -509,24 +492,12 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
           <canvas class="chart" id="e13-bar" style="height:46px"></canvas>
         </div>
       </div>
-      <div class="details">
-        <div class="card wide">
-          <h3>Qué observar</h3>
-          <ul>
-            <li>El arco iris marca bordes donde los datos no los tienen (la franja amarilla y la cian se ven como saltos) y no tiene un orden claro de más a menos.</li>
-            <li>La paleta perceptual y la de grises aumentan su luminosidad en forma pareja, así que se leen bien en blanco y negro.</li>
-            <li>La divergente solo tiene sentido cuando el centro del rango significa algo, como 0 °C o el nivel del mar.</li>
-            <li>En el fractal casi todos los valores son bajos: la escala logarítmica revela la estructura que la lineal esconde.</li>
-          </ul>
-        </div>
-      </div>
     </section>
 
     <!-- ===================== 1.4 ===================== -->
     <section class="panel-ex" id="e14" role="tabpanel" hidden>
       <header class="ex-head">
         <h2>1.4 Aritmética de píxeles <span class="badge">Optativo</span></h2>
-        <p>Se combinan dos imágenes A y B en una nueva C. Toda operación se define por dos decisiones: en qué espacio cromático se hace y cómo se cierra la aritmética cuando el resultado se sale de rango.</p>
       </header>
       <div class="bench">
         <div class="controls">
@@ -559,24 +530,12 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
         </div>
         <div class="stage" id="e14-stage"></div>
       </div>
-      <div class="details">
-        <div class="card wide">
-          <h3>Qué observar</h3>
-          <ul>
-            <li>Compará suma RGB clampeada y suma YIQ clampeada: en la primera aparecen colores que no estaban en ninguna de las dos imágenes (deriva cromática).</li>
-            <li>La suma promediada en RGB no altera los colores, pero oscurece el resultado donde alguna de las dos imágenes es oscura.</li>
-            <li>La resta revela diferencias: probá dos imágenes parecidas, o una imagen contra sí misma.</li>
-            <li>If-lighter en RGB mezcla canales de píxeles distintos y genera colores raros; en YIQ conserva colores reales.</li>
-          </ul>
-        </div>
-      </div>
     </section>
 
     <!-- ===================== 2.1 ===================== -->
     <section class="panel-ex" id="e21" role="tabpanel" hidden>
       <header class="ex-head">
         <h2>2.1 Filtrado por convolución</h2>
-        <p>Se trabaja sobre la luminancia Y. Para cada píxel se apoya el centro del kernel, se multiplican las celdas correlativas y se suman los productos. En los bordes se repiten la primera y la última fila o columna.</p>
       </header>
       <div class="bench">
         <div class="controls">
@@ -619,23 +578,12 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
         </div>
         <div class="stage" id="e21-stage"></div>
       </div>
-      <div class="details">
-        <div class="card wide">
-          <h3>Qué observar</h3>
-          <ul>
-            <li>El plano borronea más que Bartlett y gaussiano con el mismo tamaño, y deja un leve "rebote" típico de la sinc.</li>
-            <li>El Laplaciano resalta aristas en todas las direcciones; cada Sobel resalta solo las que van de oscuro a claro en su dirección.</li>
-            <li>La diferencia de gaussianas elimina tanto el fondo parejo como el ruido más fino: deja una banda de frecuencias intermedias.</li>
-          </ul>
-        </div>
-      </div>
     </section>
 
     <!-- ===================== 2.2 ===================== -->
     <section class="panel-ex" id="e22" role="tabpanel" hidden>
       <header class="ex-head">
         <h2>2.2 Morfología en niveles de gris</h2>
-        <p>Con un elemento estructurante cuadrado de 3×3, la erosión toma el mínimo de la vecindad y la dilatación el máximo. El resto de las operaciones se arma combinándolas.</p>
       </header>
       <div class="bench">
         <div class="controls">
@@ -669,23 +617,12 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
         </div>
         <div class="stage" id="e22-stage"></div>
       </div>
-      <div class="details">
-        <div class="card wide">
-          <h3>Qué observar</h3>
-          <ul>
-            <li>Con ruido sal y pimienta, la mediana lo elimina casi por completo sin borronear los bordes, cosa que el gaussiano del 2.1 no logra.</li>
-            <li>La apertura borra detalles claros más chicos que 3×3, y el cierre los oscuros. En la página escaneada, el cierre afina las letras y la apertura las engrosa (son oscuras sobre blanco).</li>
-            <li>El top-hat en la imagen del Hubble aísla las estrellas pequeñas y brillantes.</li>
-          </ul>
-        </div>
-      </div>
     </section>
 
     <!-- ===================== 2.3 ===================== -->
     <section class="panel-ex" id="e23" role="tabpanel" hidden>
       <header class="ex-head">
         <h2>2.3 Remuestreo y cuantización <span class="badge">Optativo</span></h2>
-        <p>Cambiar la resolución es ajustar las muestras a una función interpolante y evaluarla en nuevas posiciones. Cuantizar es forzar cada luminancia a uno de n niveles. Ambas imágenes se muestran siempre al mismo tamaño para compararlas.</p>
       </header>
       <div class="bench">
         <div class="controls">
@@ -716,16 +653,6 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
           <p class="hint">La placa zonal (última imagen de la barra lateral) tiene frecuencias crecientes hacia los bordes: es ideal para ver el aliasing.</p>
         </div>
         <div class="stage" id="e23-stage"></div>
-      </div>
-      <div class="details">
-        <div class="card wide">
-          <h3>Qué observar</h3>
-          <ul>
-            <li>En la placa zonal, el downsampling constante genera anillos falsos (aliasing). Bilineal y bicúbico los atenúan porque filtran antes de muestrear.</li>
-            <li>En upsampling, el constante deja escalones; el bilineal suaviza pero borronea, y el bicúbico conserva más nitidez. Usá el zoom 4×.</li>
-            <li>Con pocos niveles, la uniforme genera falsos contornos. El dithering y la difusión los cambian por textura, y la forma se entiende mejor aunque el error RMS sea igual o mayor.</li>
-          </ul>
-        </div>
       </div>
     </section>
    </div>
