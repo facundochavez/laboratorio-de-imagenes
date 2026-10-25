@@ -1403,6 +1403,8 @@ async function descargarPNG(img, filename, btn) {
 }
 
 /* ---------- Escenario de comparación ---------- */
+// Modo de comparación compartido: "Lado a lado" o "Cortina" se mantiene al cambiar de pestaña
+const VISTA = { mode: "side", stages: [] };
 function makeStage(root, labels, opts = {}) {
   const compare = opts.compare !== false && labels.length === 2;
   const st = { imgs: [], mode: "side", zoom: 1, pos: 50 };
@@ -1426,7 +1428,11 @@ function makeStage(root, labels, opts = {}) {
     </div>`;
   const wells = $$(".wells .well", root), canv = wells.map(w => $("canvas", w)), scrollers = $$(".scroller", root);
   const layout = () => { root.classList.toggle("mode-curtain", st.mode === "curtain"); root.classList.toggle("zoomed", st.zoom > 1); root.style.setProperty("--z", st.zoom); draw(); };
-  if (compare) segInit($('[data-r="mode"]', root), v => { st.mode = v; layout(); });
+  if (compare) {
+    const setMode = v => { st.mode = v; segSet($('[data-r="mode"]', root), v); root.classList.toggle("mode-curtain", v === "curtain"); };
+    segInit($('[data-r="mode"]', root), v => { VISTA.mode = v; VISTA.stages.forEach(f => f(v)); draw(); });
+    VISTA.stages.push(setMode); setMode(VISTA.mode);
+  }
   segInit($('[data-r="zoom"]', root), v => { st.zoom = +v; layout(); });
   let syncing = false;
   scrollers.forEach(sc => sc.addEventListener("scroll", () => {

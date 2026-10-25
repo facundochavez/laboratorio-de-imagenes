@@ -33,6 +33,7 @@ src/app.html          código fuente del aplicativo (HTML, CSS y JS)
 src/demo-images.js    imágenes de prueba embebidas en base64
 build.py              arma el archivo final
 dist/                 aplicativo listo para usar
+vercel.json           sirve el aplicativo en la raíz del sitio
 ```
 
 ## Desarrollo
@@ -42,6 +43,10 @@ Editar `src/app.html` y regenerar:
 ```
 python build.py
 ```
+
+## Despliegue
+
+El sitio se publica como archivos estáticos (por ejemplo en Vercel, con el preset *Other* y sin comando de build). `vercel.json` hace que la raíz del sitio sirva `dist/laboratorio-de-imagenes.html`. Antes de subir cambios, correr `python build.py` para regenerar `dist/`.
 
 ## Créditos
 
