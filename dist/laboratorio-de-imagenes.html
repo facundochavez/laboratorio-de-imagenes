@@ -204,8 +204,19 @@ label.check input{accent-color:var(--accent); width:16px; height:16px}
 .stage{min-width:0}
 .stage-bar{display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; align-items:center; margin-bottom:12px}
 .stage-bar .grp{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-body.no-downloads [data-r="dl"]{display:none}
-.stage-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:12px}
+body.no-downloads [data-r="dl"],body.no-downloads [data-r="dl0"]{display:none}
+/* Acciones debajo de cada imagen, en las mismas columnas que las imágenes:
+   "Descargar" bajo la original (derecha de su columna) y "Aplicar" + "Descargar" bajo el resultado */
+.stage-actions{display:grid; grid-template-columns:repeat(var(--n,2), minmax(0,1fr)); gap:14px; margin-top:12px}
+.act-cell{display:flex; justify-content:flex-end; align-items:center; gap:8px; min-width:0}
+.act-last{flex-wrap:nowrap}   /* si la columna es angosta, los dos botones se extienden hacia la izquierda sin apilarse */
+.stage-actions .sfx{display:none}
+/* En cortina (una sola vista) las acciones se reparten en una fila: original a la izquierda, resultado a la derecha */
+.mode-curtain .stage-actions{display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between}
+.mode-curtain .act-last{margin-left:auto}
+.mode-curtain .act-first{justify-content:flex-start}
+.mode-curtain .act-mid{display:none}
+.mode-curtain .stage-actions .sfx{display:inline}
 .stage-actions .btn{padding:4px 11px 4px 9px; font-size:13px; line-height:1.4; border-radius:7px; gap:5px}
 .stage-actions .btn svg{width:14px; height:14px; flex:none}
 .btn:disabled{opacity:.45; cursor:not-allowed}
@@ -316,7 +327,15 @@ pre.code .ln.chg{background:var(--code-flash); transition:none}
   .bench{grid-template-columns:minmax(0,1fr)}
   .controls{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); align-items:start}
 }
-@container (max-width: 560px){ .wells,.charts,.minis{grid-template-columns:minmax(0,1fr)} }
+@container (max-width: 560px){
+  .wells,.charts,.minis{grid-template-columns:minmax(0,1fr)}
+  /* Con las imágenes apiladas, las acciones van en una fila como en la cortina */
+  .stage-actions{display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between}
+  .act-first{justify-content:flex-start}
+  .act-last{margin-left:auto}
+  .act-mid{display:none}
+  .stage-actions .sfx{display:inline}
+}
 @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
 </style>
 </head>
@@ -1356,9 +1375,13 @@ function makeStage(root, labels, opts = {}) {
         <canvas class="cA"></canvas><canvas class="cB"></canvas><div class="handle"></div>
         <span class="tag l">${labels[0]}</span><span class="tag r">${labels[1]}</span>
       </div></div><figcaption><span>Arrastrá el divisor para comparar</span><span class="dim"></span></figcaption></figure>` : ""}
-    <div class="stage-actions">
-      <button class="btn" data-r="apply" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Aplicar</button>
-      <button class="btn" data-r="dl" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>Descargar</button>
+    <div class="stage-actions" style="--n:${labels.length}">
+      <div class="act-cell act-first"><button class="btn" data-r="dl0" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>Descargar<span class="sfx">original</span></button></div>
+      ${'<div class="act-cell act-mid"></div>'.repeat(Math.max(0, labels.length - 2))}
+      <div class="act-cell act-last">
+        <button class="btn" data-r="apply" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Aplicar</button>
+        <button class="btn" data-r="dl" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>Descargar</button>
+      </div>
     </div>`;
   const wells = $$(".wells .well", root), canv = wells.map(w => $("canvas", w)), scrollers = $$(".scroller", root);
   const layout = () => { root.classList.toggle("mode-curtain", st.mode === "curtain"); root.classList.toggle("zoomed", st.zoom > 1); root.style.setProperty("--z", st.zoom); draw(); };
@@ -1409,6 +1432,10 @@ function makeStage(root, labels, opts = {}) {
     const img = st.imgs[st.imgs.length - 1]; if (!img || btn.disabled) return;
     aplicarResultado(img);
   }));
+  $$('[data-r="dl0"]', root).forEach(btn => btn.addEventListener("click", () => {
+    const img = st.imgs[0]; if (!img) return;
+    descargarPNG(img, `${opts.file || "resultado"}_${App.current ? App.current.id : "imagen"}_original.png`, btn);
+  }));
   $$('[data-r="dl"]', root).forEach(btn => btn.addEventListener("click", () => {
     const img = st.imgs[st.imgs.length - 1]; if (!img) return;
     descargarPNG(img, `${opts.file || "resultado"}_${App.current ? App.current.id : "imagen"}.png`, btn);
@@ -1419,6 +1446,7 @@ function makeStage(root, labels, opts = {}) {
     const puede = opts.canApply ? opts.canApply() : true;
     $$('[data-r="apply"]', root).forEach(b => { b.disabled = !puede; b.title = puede ? "Reemplazar la imagen de origen por el resultado" : (opts.applyHint || "No disponible"); });
     $$('[data-r="dl"]', root).forEach(b => { b.title = "Descargar el resultado en PNG"; });
+    $$('[data-r="dl0"]', root).forEach(b => { b.title = "Descargar la imagen original en PNG"; });
     requestAnimationFrame(() => $$("canvas", root).forEach(c => c.classList.toggle("px", c.clientWidth >= c.width - 0.5)));
   }
   return {
@@ -1490,8 +1518,14 @@ const App = { images: [], current: null, tabs: {}, active: null };
 let pending = false;
 function schedule() { if (pending) return; pending = true; requestAnimationFrame(() => { pending = false; const t = App.tabs[App.active]; if (t && App.current) t.render(); }); }
 
-async function decodeToImg(src, maxSide = 640) {
+// Límites de tamaño:
+// - las imágenes cargadas se reducen a 640 px de lado mayor (así todos los algoritmos responden al instante);
+// - un resultado aplicado nunca puede superar 2560 px de lado (por eso se bloquea "Aplicar" en un upsampling que lo pasaría);
+// - no se aceptan archivos de más de 40 MB ni de más de 100 megapíxeles.
+const LADO_MAX_CARGA = 640, LADO_MAX_APLICADO = 2560, MB_MAX_ARCHIVO = 40, MPX_MAX_ARCHIVO = 100;
+async function decodeToImg(src, maxSide = LADO_MAX_CARGA) {
   const im = new Image(); im.src = src; await im.decode();
+  if (im.naturalWidth * im.naturalHeight > MPX_MAX_ARCHIVO * 1e6) throw { code: "mpx", w: im.naturalWidth, h: im.naturalHeight };
   const s = Math.min(1, maxSide / Math.max(im.naturalWidth, im.naturalHeight));
   const w = Math.max(1, Math.round(im.naturalWidth * s)), h = Math.max(1, Math.round(im.naturalHeight * s));
   // Solo decodificación del archivo; el procesamiento empieza después.
@@ -1510,7 +1544,7 @@ function zonePlate(N = 384) {
   return img;
 }
 const ICON_X = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
-const ICON_UNDO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>`;
+const ICON_UNDO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`;
 function addThumb(entry, select) {
   const grid = $("#imgs"), b = document.createElement("button");
   b.className = "thumb"; b.type = "button"; b.dataset.id = entry.id; b.setAttribute("aria-pressed", "false");
@@ -1539,7 +1573,7 @@ function removeImage(id, node) {
 }
 // "Aplicar": el resultado pasa a ser la imagen de origen (la original se guarda para poder restaurarla)
 function aplicarResultado(res) {
-  const e = App.current; if (!e) return;
+  const e = App.current; if (!e || Math.max(res.w, res.h) > LADO_MAX_APLICADO) return;
   let img;
   if (res.c === 4) { img = makeImg(res.w, res.h, 3); for (let p = 0; p < res.w * res.h; p++) for (let k = 0; k < 3; k++) img.d[3 * p + k] = res.d[4 * p + k] / 255; }
   else { img = makeImg(res.w, res.h, res.c); img.d.set(res.d); }
@@ -1561,11 +1595,20 @@ function setCurrent(id) {
   schedule();
 }
 let userCount = 0;
+function avisoCarga(texto) { const h = $("#side-hint"); h.textContent = texto; h.hidden = !texto; }
 async function loadFile(file) {
   if (!file || !file.type.startsWith("image/")) return;
+  if (file.size > MB_MAX_ARCHIVO * 1024 * 1024) {
+    avisoCarga(`La imagen pesa ${(file.size / 1048576).toLocaleString("es-AR", { maximumFractionDigits: 1 })} MB. El máximo es ${MB_MAX_ARCHIVO} MB.`);
+    return;
+  }
   const url = URL.createObjectURL(file);
-  try { addThumb({ user: true, id: "user" + (++userCount), label: file.name.replace(/\.[^.]+$/, "").slice(0, 16), img: await decodeToImg(url) }, true); $("#side-hint").hidden = true; }
-  catch (e) { const h = $("#side-hint"); h.textContent = "No se pudo abrir ese archivo. Probá con PNG o JPG."; h.hidden = false; }
+  try { addThumb({ user: true, id: "user" + (++userCount), label: file.name.replace(/\.[^.]+$/, "").slice(0, 16), img: await decodeToImg(url) }, true); avisoCarga(""); }
+  catch (e) {
+    avisoCarga(e && e.code === "mpx"
+      ? `La imagen mide ${e.w} × ${e.h} px. El máximo es ${MPX_MAX_ARCHIVO} megapíxeles.`
+      : "No se pudo abrir ese archivo. Probá con PNG o JPG.");
+  }
   finally { URL.revokeObjectURL(url); }
 }
 
@@ -1839,7 +1882,10 @@ App.tabs.e22 = (() => {
    2.3
    ===================================================================== */
 App.tabs.e23 = (() => {
-  const stage = makeStage($("#e23-stage"), ["Original", "Resultado"], { file: "ej2-3" });
+  // Un upsampling solo se puede aplicar si el resultado no supera LADO_MAX_APLICADO
+  const ampliacionExcedida = () => segVal($("#e23-mode")) === "up" && App.current && 2 * Math.max(App.current.img.w, App.current.img.h) > LADO_MAX_APLICADO;
+  const stage = makeStage($("#e23-stage"), ["Original", "Resultado"], { file: "ej2-3",
+    canApply: () => !ampliacionExcedida(), applyHint: `La imagen ampliada superaría los ${LADO_MAX_APLICADO} px de lado` });
   const mode = $("#e23-mode"), k = $("#e23-k"), qm = $("#e23-qm"), nIn = $("#e23-n");
   const sync = () => { const m = segVal(mode); $("#e23-rs").hidden = m === "quant"; $("#e23-q").hidden = m !== "quant"; };
   segInit(mode, () => { sync(); schedule(); }); segInit(k, schedule); segInit(qm, schedule);
@@ -1864,7 +1910,8 @@ App.tabs.e23 = (() => {
       stage.setLabel(0, m === "down" ? "Original" : "Original al doble de tamaño");
       stage.setLabel(1, m === "down" ? "Reducida, mostrada al doble de tamaño" : "Ampliada ×2");
       stage.set(0, src); stage.set(1, out); stage.draw();
-      $("#e23-stat").innerHTML = `${src.w} × ${src.h} px → <b>${out.w} × ${out.h} px</b>`;
+      $("#e23-stat").innerHTML = `${src.w} × ${src.h} px → <b>${out.w} × ${out.h} px</b>`
+        + (ampliacionExcedida() ? `<br>No se puede aplicar: el resultado supera el máximo de ${LADO_MAX_APLICADO} px de lado.` : "");
       setCode("e23", [`// ${m === "down" ? "Downsampling" : "Upsampling"} ×2 con kernel ${KN[kern]}\nconst kernel = "${kern}";`,
         `// Ejecución: cada canal (R, G y B, o el único canal si es gris) por separado\nconst resultado = canales.map(canal => remuestrear(canal, kernel, ${paso.name}));`,
         fuente(remuestrear), fuente(paso),
